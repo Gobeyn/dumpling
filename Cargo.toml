@@ -10,3 +10,4 @@ getopts = "0.2.21"
 crossterm = "0.27.0"
 serde = { version = "1.0.204", features = ["derive"] }
 toml = "0.8.14"
+regex = "1.10.5"

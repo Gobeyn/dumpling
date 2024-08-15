@@ -1,18 +1,18 @@
+use super::loader;
 use serde::{Deserialize, Serialize};
 use std::io::Read;
-//use std::io::Write;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Author {
     pub name: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Tag {
     pub label: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(default)]
 pub struct Paper {
     pub title: String,
@@ -75,6 +75,29 @@ pub fn parse_paper_toml(filepath: &mut std::path::PathBuf) -> Option<Paper> {
     return Some(paper);
 }
 
-//pub fn write_paper_to_toml(paper: Paper, filepath: std::path::PathBuf) {
-//
-//}
+pub fn write_paper_to_toml(paper: &Paper, filepath: &std::path::PathBuf) {
+    let toml_str = toml::to_string(paper).expect("Error parsing Paper struct to Toml string");
+    std::fs::write(filepath, toml_str).expect("Error writing Toml file.");
+}
+
+pub fn write_new_paper(paper: &Paper, filedir: &std::path::PathBuf) {
+    let paths = match std::fs::read_dir(filedir) {
+        Ok(p) => p,
+        Err(_) => {
+            println!("Error trying to obtain paper information file paths.");
+            std::process::exit(1);
+        }
+    };
+    let num_files = paths.count();
+
+    // Create file path for new paper entry
+    let mut new_paper_filepath = filedir.clone();
+    if num_files == 0 {
+        new_paper_filepath.push("1.toml");
+    } else {
+        new_paper_filepath.push(format!("{}.toml", num_files + 1));
+    }
+
+    // Write the paper entry
+    write_paper_to_toml(paper, &new_paper_filepath);
+}
