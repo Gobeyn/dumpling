@@ -1,7 +1,8 @@
-use super::super::key::event;
 use super::ui_wrapper;
+use crate::file::loader::Loader;
+use crate::key::event;
 
-pub fn create_window() {
+pub fn create_window(file_load: &mut Loader, filedir: &std::path::PathBuf) {
     // Enable raw mode, disabling user input like typing
     crossterm::terminal::enable_raw_mode().expect("Error enabling raw mode.");
     // Create alternate screen on top of current terminal session
@@ -14,14 +15,26 @@ pub fn create_window() {
 
     // Define UI drawing loop
     let mut run = true;
+    let mut file_pointer: usize = 0;
     while run {
-        terminal
-            .draw(ui_wrapper::test_ui)
-            .expect("Error when rendering the TUI");
+        let ui = ui_wrapper::ui_pre_args(file_load, file_pointer);
+        terminal.draw(ui).expect("Error when rendering the TUI");
         let key_event: event::KeyEvents = event::get_key_event();
         match key_event {
             event::KeyEvents::Quit => {
                 run = false;
+            }
+            event::KeyEvents::Next => {
+                file_load.load_next(filedir);
+                file_pointer += 1;
+            }
+            event::KeyEvents::Previous => {
+                file_load.load_previous(filedir);
+                if file_pointer <= 1 {
+                    file_pointer = 0;
+                } else {
+                    file_pointer -= 1;
+                }
             }
             _ => {}
         }

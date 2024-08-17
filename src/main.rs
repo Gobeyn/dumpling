@@ -21,10 +21,10 @@ fn main() {
     let prog_args: ProgArgs = parse_arguments();
 
     // Load first section of existing papers.
-    let paper_loader: Loader = Loader::load_tomls(1, 30, &mut folderdir);
+    let mut file_load: Loader = Loader::load_tomls(1, 30, &mut folderdir);
 
     if prog_args.flags.open {
-        create_window();
+        create_window(&mut file_load, &folderdir);
     } else {
         if prog_args.flags.list_tags {
             println!("This has not been implemented yet.");

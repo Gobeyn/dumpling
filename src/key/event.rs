@@ -1,5 +1,7 @@
 pub enum KeyEvents {
     NoEvent,
+    Next,
+    Previous,
     Quit,
 }
 
@@ -17,6 +19,10 @@ pub fn get_key_event() -> KeyEvents {
                 if key.kind == crossterm::event::KeyEventKind::Press {
                     if key.code == crossterm::event::KeyCode::Char('q') {
                         return KeyEvents::Quit;
+                    } else if key.code == crossterm::event::KeyCode::Char('j') {
+                        return KeyEvents::Next;
+                    } else if key.code == crossterm::event::KeyCode::Char('k') {
+                        return KeyEvents::Previous;
                     } else {
                         return KeyEvents::NoEvent;
                     }
