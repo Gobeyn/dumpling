@@ -88,68 +88,51 @@ pub struct TuiColors {
     pub description_content: Color,
 }
 
-// TODO: Find a way to make the `from_config_file_colors` less verbose.
+/// Macro that takes an instance of `ColorFromFile`, the `TuiColors`
+/// type and all the field names. It repeatedly puts the RGB contents
+/// stored in the Vec<u8> type into the `Color::Rgb` function to
+/// generate a `ratatui::style::Color`. It does so for all the field
+/// names provided. This way it generates a new instance of `TuiColors`
+/// which is returned at the end.
+macro_rules! convert_colors {
+    // Take ColorFromFile instance, TuiColors type and all the
+    // field names as input. Repeat the same conversion operation
+    // on all the given fields. Create a new TuiColors struct
+    // by doing so.
+    ($src:ident, $dst:ident, $( $field:ident ),+) => {
+        $dst {
+            $(
+                $field: Color::Rgb(
+                    $src.$field[0],
+                    $src.$field[1],
+                    $src.$field[2],
+                ),
+            )+
+        }
+    };
+}
+
 impl TuiColors {
     /// Conversion from `ColorsFromFile` to `TuiColors` since the
-    /// program needs `ratatui::style::Color` in rendering the TUI.
+    /// program needs `ratatui::style::Color` for rendering the TUI.
+    /// The conversion uses the `convert_colors` macro.
     pub fn from_config_file_colors(cff: &ColorsFromFile) -> Self {
-        TuiColors {
-            master_block_title: Color::Rgb(
-                cff.master_block_title[0],
-                cff.master_block_title[1],
-                cff.master_block_title[2],
-            ),
-            master_block_border: Color::Rgb(
-                cff.master_block_border[0],
-                cff.master_block_border[1],
-                cff.master_block_border[2],
-            ),
-            explorer_unselected_fg: Color::Rgb(
-                cff.explorer_unselected_fg[0],
-                cff.explorer_unselected_fg[1],
-                cff.explorer_unselected_fg[2],
-            ),
-            explorer_unselected_bg: Color::Rgb(
-                cff.explorer_unselected_bg[0],
-                cff.explorer_unselected_bg[1],
-                cff.explorer_unselected_bg[2],
-            ),
-            explorer_selected_fg: Color::Rgb(
-                cff.explorer_selected_fg[0],
-                cff.explorer_selected_fg[1],
-                cff.explorer_selected_fg[2],
-            ),
-            explorer_selected_bg: Color::Rgb(
-                cff.explorer_selected_bg[0],
-                cff.explorer_selected_bg[1],
-                cff.explorer_selected_bg[2],
-            ),
-            content_block_title: Color::Rgb(
-                cff.content_block_title[0],
-                cff.content_block_title[1],
-                cff.content_block_title[2],
-            ),
-            content_block_border: Color::Rgb(
-                cff.content_block_border[0],
-                cff.content_block_border[1],
-                cff.content_block_border[2],
-            ),
-            title_content: Color::Rgb(
-                cff.title_content[0],
-                cff.title_content[1],
-                cff.title_content[2],
-            ),
-            author_content: Color::Rgb(
-                cff.author_content[0],
-                cff.author_content[1],
-                cff.author_content[2],
-            ),
-            description_content: Color::Rgb(
-                cff.description_content[0],
-                cff.description_content[1],
-                cff.description_content[2],
-            ),
-        }
+        let tui_colors = convert_colors!(
+            cff,
+            TuiColors,
+            master_block_title,
+            master_block_border,
+            explorer_unselected_fg,
+            explorer_unselected_bg,
+            explorer_selected_fg,
+            explorer_selected_bg,
+            content_block_title,
+            content_block_border,
+            title_content,
+            author_content,
+            description_content
+        );
+        return tui_colors;
     }
 }
 
