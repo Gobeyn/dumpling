@@ -97,3 +97,9 @@ Under the `[keybinds]` section, the following can be configured:
 | open_in_pdfviewer | Open the PDF file as pointed to by the currenly selected papers `docname` information with the `pdf_reader` set in the `general` section. The `pdf_dir` specified in the `general` section will be searched for this. | o |
 
 Note: all key binds are assumed the be single characters.
+
+## Planned changes
+
+- Fix issue where running `dumpling` without any arguments creates and saves a default paper entry.
+- Implement `--filter-tag` and `--list-tags` 
+- Show the paper tags in the TUI.

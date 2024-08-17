@@ -14,6 +14,7 @@ pub fn render(file_load: &Loader, config: &Config, selected_idx: usize) -> Vec<L
             let mut auth_txt = String::new();
             for auth in &p.authors {
                 auth_txt.push_str(&auth.name);
+                auth_txt.push_str(" | ");
             }
             let year_txt = format!("Published: {}", p.year);
             (auth_txt, year_txt)
