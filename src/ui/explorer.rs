@@ -2,6 +2,10 @@ use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use ratatui::prelude::*;
 
+/// Render the explorer side of the TUI. The title of all the loaded
+/// papers is displayed. The title of the paper pointed at by
+/// `selected_idx` is prepended by a selection icon as determined
+/// by the configuration file.
 pub fn render(file_load: &Loader, config: &Config, selected_idx: usize) -> Vec<Line<'static>> {
     // Initialise the text
     let mut render_text: Vec<Line> = Vec::new();

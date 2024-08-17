@@ -1,16 +1,20 @@
 use serde::{Deserialize, Serialize};
 use std::io::Read;
 
+/// Deserialization struct for parsing the paper Toml files.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Author {
     pub name: String,
 }
 
+/// Deserialization struct for parsing the paper Toml files.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Tag {
     pub label: String,
 }
 
+/// Main deserialization struct for parsing the paper Toml files.
+/// This includes vectors of the `Author` and `Tag` structs.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(default)]
 pub struct Paper {
@@ -37,6 +41,8 @@ impl Default for Paper {
     }
 }
 
+/// Given the file path to a paper Toml file, parse the file contents into
+/// the `Paper` Rust struct. If any step failed, `None` is returned.
 pub fn parse_paper_toml(filepath: &mut std::path::PathBuf) -> Option<Paper> {
     // Attempt to open the file
     let mut file = match std::fs::File::open(filepath) {
@@ -74,11 +80,17 @@ pub fn parse_paper_toml(filepath: &mut std::path::PathBuf) -> Option<Paper> {
     return Some(paper);
 }
 
+/// Given a `Paper` Rust struct and a file path, write the struct
+/// to a Toml file specified by the file path.
 pub fn write_paper_to_toml(paper: &Paper, filepath: &std::path::PathBuf) {
     let toml_str = toml::to_string(paper).expect("Error parsing Paper struct to Toml string");
     std::fs::write(filepath, toml_str).expect("Error writing Toml file.");
 }
 
+/// Effectively the same as `write_paper_to_toml`, but it does some
+/// additional things. It mainly checks the directory where they file
+/// would be safed, and gives the Toml file that will be created a
+/// standardized name.
 pub fn write_new_paper(paper: &Paper, filedir: &std::path::PathBuf) {
     let paths = match std::fs::read_dir(filedir) {
         Ok(p) => p,

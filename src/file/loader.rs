@@ -2,6 +2,9 @@ use super::parser::{parse_paper_toml, Paper};
 use std::collections::VecDeque;
 use wl_clipboard_rs::copy::{MimeType, Options, Source};
 
+/// Instead of loading the entire directory where paper Toml files
+/// are stored, only a portion is loaded. This is handled and saved
+/// in the `Loader` struct.
 #[derive(Clone, Debug)]
 pub struct Loader {
     pub file_paths: VecDeque<std::path::PathBuf>,
@@ -9,6 +12,11 @@ pub struct Loader {
 }
 
 impl Loader {
+    /// Given the directory where the paper Toml files are stored,
+    /// along with a starting index for the standerdized file naming
+    /// INT.toml and the amount of files to load, create the `Loader`
+    /// struct containing the parsed file contents and loaded file
+    /// directories.
     pub fn load_tomls(start: i32, load: i32, filedir: &mut std::path::PathBuf) -> Self {
         let end = start + load;
         let mut file_paths: VecDeque<std::path::PathBuf> = VecDeque::new();
@@ -31,7 +39,9 @@ impl Loader {
 
         return Loader { file_paths, papers };
     }
-
+    /// Load the next paper Toml file following the standerdized
+    /// convention INT.toml. The maximum load is respected by
+    /// unloading the first entry.
     pub fn load_next(&mut self, filedir: &std::path::PathBuf) {
         // Check if file_paths is empty, if so, leave.
         if self.file_paths.is_empty() {
@@ -68,7 +78,9 @@ impl Loader {
             self.papers.push_back(paper);
         }
     }
-
+    /// Load the previous paper Toml file following the standerdized
+    /// convention INT.toml. The maximum load is respected by
+    /// unloading the last entry.
     pub fn load_previous(&mut self, filedir: &std::path::PathBuf) {
         // Check if file_paths is empty, if so, leave.
         if self.file_paths.is_empty() {
@@ -111,7 +123,10 @@ impl Loader {
             self.papers.push_front(paper);
         }
     }
-
+    /// Given an index in the `Loader.papers` vector, copy the
+    /// contents of the `Paper.bibtex` field to the system clipboard.
+    /// The method assumes `wl-clipboard` is installed and uses the
+    /// `wl_clipboard_rs` crate.
     pub fn bibtex_entry_to_clipboard(&self, selected_idx: usize) {
         let bibtex_entry = match self.papers.get(selected_idx) {
             Some(p) => p.bibtex.clone(),
@@ -132,7 +147,10 @@ impl Loader {
             }
         }
     }
-
+    /// Given an index in the `Loader.file_paths` vector, open
+    /// the file path contained at that location with Neovim.
+    /// This method assumes that the `kitty` terminal emulator and
+    /// `neovim` file editor are installed.
     pub fn open_file_in_editor(&self, selected_idx: usize) {
         // Get selected filepath
         let filepath = match self.file_paths.get(selected_idx) {
@@ -156,7 +174,9 @@ impl Loader {
             }
         }
     }
-
+    /// Given an index in the `Loader.papers`, a PDF-viewer and a
+    /// directory where the PDF files are stored, open the pointed at
+    /// `pdf_dir/Papers.docname` file with the provided `pdf_viewer`.
     pub fn open_file_in_pdfviewer(
         &self,
         selected_idx: usize,
@@ -187,7 +207,9 @@ impl Loader {
             }
         }
     }
-
+    /// Given an index in the `Loader.file_paths` vector, delete the
+    /// file that index points to. That file is also removed from the
+    /// loader.
     pub fn remove_file(&mut self, selected_idx: usize) {
         // Get the file path
         let filepath = match self.file_paths.get(selected_idx) {
@@ -207,6 +229,9 @@ impl Loader {
     }
 }
 
+/// Given a file path where the file name is of the form `INT.toml`,
+/// extract the `INT` from it. If the file name is not of the required
+/// format, or anything went wrong, None is returned.
 pub fn num_from_filepath(filepath: &std::path::PathBuf) -> Option<i32> {
     let file_name_os_string = match filepath.file_name() {
         Some(f) => f,

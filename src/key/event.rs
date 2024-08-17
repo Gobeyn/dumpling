@@ -1,5 +1,7 @@
 use crate::configuration::config::Config;
 
+/// Contains all the possible events that can happen while the TUI is
+/// open.
 pub enum KeyEvents {
     NoEvent,
     Next,
@@ -11,6 +13,9 @@ pub enum KeyEvents {
     Quit,
 }
 
+/// Reads the user input, and if it matches with the key binds as
+/// dictated by the configuration file, or by the Default implementation
+/// of KeybindsFromFile.
 pub fn get_key_event(config: &Config) -> KeyEvents {
     match crossterm::event::poll(std::time::Duration::from_millis(50)) {
         Ok(_) => {

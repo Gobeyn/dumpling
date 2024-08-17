@@ -13,7 +13,7 @@ use ui::window::create_window;
 fn main() {
     // Create cache directory if it doesn't exist.
     let mut folderdir = dirs::cache_dir().expect("Error obtaining $HOME/.cache/");
-    folderdir.push("dumpling-dev");
+    folderdir.push("dumpling");
     if !folderdir.exists() {
         std::fs::create_dir(folderdir.clone()).expect("Error creating $HOME/.cache/dumpling/");
     }

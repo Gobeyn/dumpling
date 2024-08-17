@@ -2,6 +2,8 @@ use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use ratatui::prelude::*;
 
+/// Render the description block using the contents of the loaded paper
+/// pointed at by `selected_idx`.
 pub fn render(file_load: &Loader, config: &Config, selected_idx: usize) -> Vec<Line<'static>> {
     // Initialise rendered text
     let mut render_text: Vec<Line> = Vec::new();

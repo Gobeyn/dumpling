@@ -2,6 +2,14 @@ use ratatui::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::io::Read;
 
+/// Summary of the `[general]` section of the configuration file.
+///
+/// Any field not specified by the configuration takes a default as
+/// specified by the Default implementation.
+///
+/// By default `pdf_dir` is set to $HOME/.paper/, this can be changed
+/// in the configuration file, however, a direct path will need to be
+/// provided as the program cannot interpret the $HOME and ~ aliases.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(default)]
 pub struct GeneralFromFile {
@@ -24,6 +32,10 @@ impl Default for GeneralFromFile {
     }
 }
 
+/// Summary of the [colors] section of the configuration file.
+///
+/// Any field not specified by the configuration takes a default as
+/// specified by the Default implementation.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(default)]
 pub struct ColorsFromFile {
@@ -58,6 +70,9 @@ impl Default for ColorsFromFile {
     }
 }
 
+/// To use the colors provided by `ColorsFromFile`, they need to be
+/// converted to `ratatui::style::Color`. The result of that conversions
+/// is summarized into this struct.
 #[derive(Clone, Debug)]
 pub struct TuiColors {
     pub master_block_title: Color,
@@ -73,7 +88,10 @@ pub struct TuiColors {
     pub description_content: Color,
 }
 
+// TODO: Find a way to make the `from_config_file_colors` less verbose.
 impl TuiColors {
+    /// Conversion from `ColorsFromFile` to `TuiColors` since the
+    /// program needs `ratatui::style::Color` in rendering the TUI.
     pub fn from_config_file_colors(cff: &ColorsFromFile) -> Self {
         TuiColors {
             master_block_title: Color::Rgb(
@@ -135,6 +153,10 @@ impl TuiColors {
     }
 }
 
+/// Summary of the [keybinds] section of the configuration file.
+///
+/// Any field not specified by the configuration takes a default as
+/// specified by the Default implementation.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(default)]
 pub struct KeybindsFromFile {
@@ -161,7 +183,9 @@ impl Default for KeybindsFromFile {
     }
 }
 
+/// Representation of the configuration Toml file as a Rust struct.
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(default)]
 pub struct ConfigFromFile {
     pub general: GeneralFromFile,
     pub colors: ColorsFromFile,
@@ -178,6 +202,8 @@ impl Default for ConfigFromFile {
     }
 }
 
+/// Identical to `ConfigFromFile`, but with `ColorsFromFile` replaced
+/// by the `TuiColors` which the program needs for rendering.
 #[derive(Debug, Clone)]
 pub struct Config {
     pub general: GeneralFromFile,
@@ -186,6 +212,7 @@ pub struct Config {
 }
 
 impl Config {
+    /// Given file path to configuration file, create `Config` struct.
     pub fn from_config_file(filepath: &std::path::PathBuf) -> Self {
         let config_from_file = parse_config_file(filepath);
         let config = Config {
@@ -197,6 +224,8 @@ impl Config {
     }
 }
 
+/// Given file path to configuration file, parse the file contents
+/// into the `ConfigFromFile` Rust struct.
 pub fn parse_config_file(filepath: &std::path::PathBuf) -> ConfigFromFile {
     // Check if the config file exists
     if !filepath.exists() {

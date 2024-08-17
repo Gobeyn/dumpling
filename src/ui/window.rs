@@ -3,6 +3,10 @@ use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use crate::key::event;
 
+/// Main method for the program. It activates an alternate screen on top
+/// of the current terminal session with `crossterm` and subsequently
+/// render the TUI with `ratatui`. All the key binded actions are also
+/// called here.
 pub fn create_window(file_load: &mut Loader, config: &Config, filedir: &std::path::PathBuf) {
     // Enable raw mode, disabling user input like typing
     crossterm::terminal::enable_raw_mode().expect("Error enabling raw mode.");

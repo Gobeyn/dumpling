@@ -1,11 +1,14 @@
 use super::super::file;
 
+/// Summary of boolean program arguments.
 #[derive(Clone, Debug)]
 pub struct ProgFlags {
     pub open: bool,
     pub list_tags: bool,
 }
 
+/// Program arguments contained in a single structure, including
+/// boolean flags, which are summarised by `ProgFlags`.
 #[derive(Clone, Debug)]
 pub struct ProgArgs {
     pub title: String,
@@ -45,6 +48,7 @@ impl Default for ProgArgs {
 }
 
 impl ProgArgs {
+    /// Convert subset of `ProgArgs` fields into `Paper` struct.
     pub fn to_paper(&self) -> file::parser::Paper {
         let mut author_vec: Vec<file::parser::Author> = Vec::new();
         let mut tag_vec: Vec<file::parser::Tag> = Vec::new();
@@ -70,6 +74,9 @@ impl ProgArgs {
     }
 }
 
+/// Using the `getopts` crate, the program arguments are parsed into the
+/// `ProgArgs` struct. Any arguments not provided take a default value
+/// as described by the Default implementation on `ProgArgs`.
 pub fn parse_arguments() -> ProgArgs {
     let args: Vec<String> = std::env::args().collect();
     let mut prog_args: ProgArgs = ProgArgs::default();

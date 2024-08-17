@@ -6,6 +6,10 @@ use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use ratatui::{prelude::*, widgets::*};
 
+/// Given all the needed program information e.g. the loaded papers,
+/// the configuration file and the currently pointed at loaded paper
+/// index, return a UI function that only takes in a `Frame` to be
+/// used for rendering.
 pub fn ui_pre_args<'a>(
     file_load: &'a Loader,
     config: &'a Config,
