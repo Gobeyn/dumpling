@@ -2,10 +2,15 @@ use super::author;
 use super::description;
 use super::explorer;
 use super::title;
+use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use ratatui::{prelude::*, widgets::*};
 
-pub fn ui_pre_args<'a>(file_load: &'a Loader, selected_idx: usize) -> Box<dyn Fn(&mut Frame) + 'a> {
+pub fn ui_pre_args<'a>(
+    file_load: &'a Loader,
+    config: &'a Config,
+    selected_idx: usize,
+) -> Box<dyn Fn(&mut Frame) + 'a> {
     Box::new(move |frame: &mut Frame| {
         let master_layout = Layout::new(
             Direction::Horizontal,
@@ -19,18 +24,17 @@ pub fn ui_pre_args<'a>(file_load: &'a Loader, selected_idx: usize) -> Box<dyn Fn
             .title_alignment(Alignment::Center)
             .title_style(
                 Style::default()
-                    .fg(Color::Rgb(255, 255, 255))
+                    .fg(config.colors.master_block_title)
                     .add_modifier(Modifier::BOLD | Modifier::ITALIC),
             )
             .border_type(BorderType::Rounded)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)));
+            .border_style(Style::default().fg(config.colors.master_block_border));
 
-        let explorer_render = explorer::render(file_load, selected_idx);
+        let explorer_render = explorer::render(file_load, config, selected_idx);
         let explorer_paragraph = Paragraph::new(explorer_render)
             .block(explorer_block)
             .alignment(Alignment::Left);
-
         // Paper content viewer UI
         let content_layout = Layout::new(
             Direction::Vertical,
@@ -48,25 +52,25 @@ pub fn ui_pre_args<'a>(file_load: &'a Loader, selected_idx: usize) -> Box<dyn Fn
             .title_alignment(Alignment::Center)
             .title_style(
                 Style::default()
-                    .fg(Color::Rgb(255, 255, 255))
+                    .fg(config.colors.master_block_title)
                     .add_modifier(Modifier::BOLD | Modifier::ITALIC),
             )
             .border_type(BorderType::Rounded)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)));
+            .border_style(Style::default().fg(config.colors.master_block_border));
 
         let title_block = Block::new()
             .title(" Title ")
             .title_alignment(Alignment::Center)
             .title_style(
                 Style::default()
-                    .fg(Color::Rgb(255, 255, 255))
+                    .fg(config.colors.content_block_title)
                     .add_modifier(Modifier::ITALIC),
             )
             .border_type(BorderType::Plain)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)));
-        let title_render = title::render(&file_load, selected_idx);
+            .border_style(Style::default().fg(config.colors.content_block_border));
+        let title_render = title::render(&file_load, &config, selected_idx);
         let title_paragraph = Paragraph::new(title_render)
             .block(title_block)
             .alignment(Alignment::Center)
@@ -77,13 +81,13 @@ pub fn ui_pre_args<'a>(file_load: &'a Loader, selected_idx: usize) -> Box<dyn Fn
             .title_alignment(Alignment::Center)
             .title_style(
                 Style::default()
-                    .fg(Color::Rgb(255, 255, 255))
+                    .fg(config.colors.content_block_title)
                     .add_modifier(Modifier::ITALIC),
             )
             .border_type(BorderType::Plain)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)));
-        let author_render = author::render(&file_load, selected_idx);
+            .border_style(Style::default().fg(config.colors.content_block_border));
+        let author_render = author::render(&file_load, &config, selected_idx);
         let author_paragraph = Paragraph::new(author_render)
             .block(author_block)
             .alignment(Alignment::Left)
@@ -94,13 +98,13 @@ pub fn ui_pre_args<'a>(file_load: &'a Loader, selected_idx: usize) -> Box<dyn Fn
             .title_alignment(Alignment::Center)
             .title_style(
                 Style::default()
-                    .fg(Color::Rgb(255, 255, 255))
+                    .fg(config.colors.content_block_title)
                     .add_modifier(Modifier::ITALIC),
             )
             .border_type(BorderType::Plain)
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Rgb(255, 255, 255)));
-        let desc_render = description::render(&file_load, selected_idx);
+            .border_style(Style::default().fg(config.colors.content_block_border));
+        let desc_render = description::render(&file_load, &config, selected_idx);
         let desc_paragraph = Paragraph::new(desc_render)
             .block(desc_block)
             .alignment(Alignment::Left)

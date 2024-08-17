@@ -1,7 +1,8 @@
+use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use ratatui::prelude::*;
 
-pub fn render(file_load: &Loader, selected_idx: usize) -> Vec<Line<'static>> {
+pub fn render(file_load: &Loader, config: &Config, selected_idx: usize) -> Vec<Line<'static>> {
     // Initialise rendered text
     let mut render_text: Vec<Line> = Vec::new();
 
@@ -23,11 +24,11 @@ pub fn render(file_load: &Loader, selected_idx: usize) -> Vec<Line<'static>> {
 
     render_text.push(Line::from(Span::styled(
         author,
-        Style::default().fg(Color::Rgb(255, 255, 255)),
+        Style::default().fg(config.colors.author_content),
     )));
     render_text.push(Line::from(Span::styled(
         year,
-        Style::default().fg(Color::Rgb(255, 255, 255)),
+        Style::default().fg(config.colors.author_content),
     )));
 
     return render_text;

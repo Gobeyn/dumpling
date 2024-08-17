@@ -132,6 +132,61 @@ impl Loader {
             }
         }
     }
+
+    pub fn open_file_in_editor(&self, selected_idx: usize) {
+        // Get selected filepath
+        let filepath = match self.file_paths.get(selected_idx) {
+            Some(f) => f.clone(),
+            None => {
+                return;
+            }
+        };
+        // Open file in editor in a new window, note that the terminal and editor are hard coded.
+        match std::process::Command::new("kitty")
+            .arg("--detach")
+            .arg("nvim")
+            .arg(filepath)
+            .spawn()
+        {
+            Ok(_) => {
+                return;
+            }
+            Err(_) => {
+                return;
+            }
+        }
+    }
+
+    pub fn open_file_in_pdfviewer(
+        &self,
+        selected_idx: usize,
+        pdf_viewer: &String,
+        pdf_dir: &String,
+    ) {
+        // Get file name from the paper content
+        let filename = match self.papers.get(selected_idx) {
+            Some(p) => p.docname.clone(),
+            None => {
+                return;
+            }
+        };
+        // Create path to that file with pdf_dir as directory
+        let mut filepath = std::path::PathBuf::from(pdf_dir);
+        filepath.push(filename);
+
+        // Check if that file exists
+        if filepath.exists() {
+            // Open in given PDF viewer.
+            match std::process::Command::new(pdf_viewer).arg(filepath).spawn() {
+                Ok(_) => {
+                    return;
+                }
+                Err(_) => {
+                    return;
+                }
+            }
+        }
+    }
 }
 
 pub fn num_from_filepath(filepath: &std::path::PathBuf) -> Option<i32> {

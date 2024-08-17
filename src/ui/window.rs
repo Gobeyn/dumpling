@@ -1,8 +1,9 @@
 use super::ui_wrapper;
+use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use crate::key::event;
 
-pub fn create_window(file_load: &mut Loader, filedir: &std::path::PathBuf) {
+pub fn create_window(file_load: &mut Loader, config: &Config, filedir: &std::path::PathBuf) {
     // Enable raw mode, disabling user input like typing
     crossterm::terminal::enable_raw_mode().expect("Error enabling raw mode.");
     // Create alternate screen on top of current terminal session
@@ -17,9 +18,9 @@ pub fn create_window(file_load: &mut Loader, filedir: &std::path::PathBuf) {
     let mut run = true;
     let mut file_pointer: usize = 0;
     while run {
-        let ui = ui_wrapper::ui_pre_args(file_load, file_pointer);
+        let ui = ui_wrapper::ui_pre_args(file_load, config, file_pointer);
         terminal.draw(ui).expect("Error when rendering the TUI");
-        let key_event: event::KeyEvents = event::get_key_event();
+        let key_event: event::KeyEvents = event::get_key_event(config);
         match key_event {
             event::KeyEvents::Quit => {
                 run = false;
@@ -42,6 +43,16 @@ pub fn create_window(file_load: &mut Loader, filedir: &std::path::PathBuf) {
             }
             event::KeyEvents::Bibtex => {
                 file_load.bibtex_entry_to_clipboard(file_pointer);
+            }
+            event::KeyEvents::Edit => {
+                file_load.open_file_in_editor(file_pointer);
+            }
+            event::KeyEvents::Open => {
+                file_load.open_file_in_pdfviewer(
+                    file_pointer,
+                    &config.general.pdf_viewer,
+                    &config.general.pdf_dir,
+                );
             }
             _ => {}
         }
