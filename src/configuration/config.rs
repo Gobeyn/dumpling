@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::io::Read;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(default)]
 pub struct GeneralFromFile {
     pub load_size: i32,
     pub pdf_viewer: String,
@@ -26,33 +27,33 @@ impl Default for GeneralFromFile {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(default)]
 pub struct ColorsFromFile {
-    pub master_block_title: [u8; 3],
-    pub master_block_border: [u8; 3],
-    pub explorer_unselected_fg: [u8; 3],
-    pub explorer_unselected_bg: [u8; 3],
-    pub explorer_selected_fg: [u8; 3],
-    pub explorer_selected_bg: [u8; 3],
-    pub content_block_title: [u8; 3],
-    pub content_block_border: [u8; 3],
-    pub title_content: [u8; 3],
-    pub author_content: [u8; 3],
-    pub description_content: [u8; 3],
+    pub master_block_title: Vec<u8>,
+    pub master_block_border: Vec<u8>,
+    pub explorer_unselected_fg: Vec<u8>,
+    pub explorer_unselected_bg: Vec<u8>,
+    pub explorer_selected_fg: Vec<u8>,
+    pub explorer_selected_bg: Vec<u8>,
+    pub content_block_title: Vec<u8>,
+    pub content_block_border: Vec<u8>,
+    pub title_content: Vec<u8>,
+    pub author_content: Vec<u8>,
+    pub description_content: Vec<u8>,
 }
 
 impl Default for ColorsFromFile {
     fn default() -> Self {
         ColorsFromFile {
-            master_block_title: [255, 255, 255],
-            master_block_border: [255, 255, 255],
-            explorer_unselected_fg: [0, 0, 255],
-            explorer_unselected_bg: [0, 0, 0],
-            explorer_selected_fg: [0, 0, 255],
-            explorer_selected_bg: [48, 48, 48],
-            content_block_title: [255, 255, 255],
-            content_block_border: [255, 255, 255],
-            title_content: [255, 255, 255],
-            author_content: [255, 255, 255],
-            description_content: [255, 255, 255],
+            master_block_title: vec![255, 255, 255],
+            master_block_border: vec![255, 255, 255],
+            explorer_unselected_fg: vec![0, 0, 255],
+            explorer_unselected_bg: vec![0, 0, 0],
+            explorer_selected_fg: vec![0, 0, 255],
+            explorer_selected_bg: vec![48, 48, 48],
+            content_block_title: vec![255, 255, 255],
+            content_block_border: vec![255, 255, 255],
+            title_content: vec![255, 255, 255],
+            author_content: vec![255, 255, 255],
+            description_content: vec![255, 255, 255],
         }
     }
 }
@@ -135,6 +136,7 @@ impl TuiColors {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(default)]
 pub struct KeybindsFromFile {
     pub quit: char,
     pub next: char,
@@ -224,7 +226,8 @@ pub fn parse_config_file(filepath: &std::path::PathBuf) -> ConfigFromFile {
     // Convert config Toml to struct
     let config_struct: ConfigFromFile = match parsed_toml.try_into() {
         Ok(v) => v,
-        Err(_) => {
+        Err(e) => {
+            eprintln!("Error converting to struct: {}", e);
             return ConfigFromFile::default();
         }
     };
