@@ -26,7 +26,11 @@ pub fn create_window(file_load: &mut Loader, filedir: &std::path::PathBuf) {
             }
             event::KeyEvents::Next => {
                 file_load.load_next(filedir);
-                file_pointer += 1;
+                if file_pointer >= file_load.papers.len() - 1 {
+                    file_pointer = file_load.papers.len() - 1;
+                } else {
+                    file_pointer += 1;
+                }
             }
             event::KeyEvents::Previous => {
                 file_load.load_previous(filedir);
@@ -35,6 +39,9 @@ pub fn create_window(file_load: &mut Loader, filedir: &std::path::PathBuf) {
                 } else {
                     file_pointer -= 1;
                 }
+            }
+            event::KeyEvents::Bibtex => {
+                file_load.bibtex_entry_to_clipboard(file_pointer);
             }
             _ => {}
         }

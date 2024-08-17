@@ -2,6 +2,7 @@ pub enum KeyEvents {
     NoEvent,
     Next,
     Previous,
+    Bibtex,
     Quit,
 }
 
@@ -23,6 +24,8 @@ pub fn get_key_event() -> KeyEvents {
                         return KeyEvents::Next;
                     } else if key.code == crossterm::event::KeyCode::Char('k') {
                         return KeyEvents::Previous;
+                    } else if key.code == crossterm::event::KeyCode::Char('b') {
+                        return KeyEvents::Bibtex;
                     } else {
                         return KeyEvents::NoEvent;
                     }

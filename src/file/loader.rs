@@ -1,5 +1,6 @@
 use super::parser::{parse_paper_toml, Paper};
 use std::collections::VecDeque;
+use wl_clipboard_rs::copy::{MimeType, Options, Source};
 
 #[derive(Clone, Debug)]
 pub struct Loader {
@@ -108,6 +109,27 @@ impl Loader {
             // Add new path and paper to the front
             self.file_paths.push_front(path_prev_load);
             self.papers.push_front(paper);
+        }
+    }
+
+    pub fn bibtex_entry_to_clipboard(&self, selected_idx: usize) {
+        let bibtex_entry = match self.papers.get(selected_idx) {
+            Some(p) => p.bibtex.clone(),
+            None => {
+                return;
+            }
+        };
+        let opts = Options::new();
+        match opts.copy(
+            Source::Bytes(bibtex_entry.into_bytes().into()),
+            MimeType::Autodetect,
+        ) {
+            Ok(_) => {
+                return;
+            }
+            Err(_) => {
+                return;
+            }
         }
     }
 }
