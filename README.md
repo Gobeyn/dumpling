@@ -103,3 +103,7 @@ Note: all key binds are assumed the be single characters.
 - Fix issue where running `dumpling` without any arguments creates and saves a default paper entry.
 - Implement `--filter-tag` and `--list-tags` 
 - Show the paper tags in the TUI.
+
+## Why Dumpling
+
+Because paper -> rice paper -> dumpling.
