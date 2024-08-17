@@ -47,6 +47,9 @@ pub fn create_window(file_load: &mut Loader, config: &Config, filedir: &std::pat
             event::KeyEvents::Edit => {
                 file_load.open_file_in_editor(file_pointer);
             }
+            event::KeyEvents::Delete => {
+                file_load.remove_file(file_pointer);
+            }
             event::KeyEvents::Open => {
                 file_load.open_file_in_pdfviewer(
                     file_pointer,

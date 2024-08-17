@@ -19,7 +19,7 @@ pub fn render(file_load: &Loader, config: &Config, selected_idx: usize) -> Vec<L
             style = Style::default()
                 .fg(config.colors.explorer_selected_fg)
                 .bg(config.colors.explorer_selected_bg)
-                .add_modifier(Modifier::ITALIC);
+                .add_modifier(Modifier::BOLD);
         }
         line.push_str(&paper.title);
         render_text.push(Line::from(Span::styled(line, style)));

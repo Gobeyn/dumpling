@@ -187,6 +187,24 @@ impl Loader {
             }
         }
     }
+
+    pub fn remove_file(&mut self, selected_idx: usize) {
+        // Get the file path
+        let filepath = match self.file_paths.get(selected_idx) {
+            Some(f) => f.clone(),
+            None => {
+                return;
+            }
+        };
+        // Check if it exists
+        if filepath.exists() {
+            // Delete it
+            std::fs::remove_file(filepath).expect("Error attempting to remove file.");
+            // Remove file path and paper from the loader
+            self.file_paths.remove(selected_idx);
+            self.papers.remove(selected_idx);
+        }
+    }
 }
 
 pub fn num_from_filepath(filepath: &std::path::PathBuf) -> Option<i32> {

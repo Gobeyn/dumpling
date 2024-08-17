@@ -143,6 +143,7 @@ pub struct KeybindsFromFile {
     pub previous: char,
     pub bibtex_to_clipboard: char,
     pub edit: char,
+    pub delete: char,
     pub open_in_pdfviewer: char,
 }
 
@@ -154,6 +155,7 @@ impl Default for KeybindsFromFile {
             previous: 'k',
             bibtex_to_clipboard: 'b',
             edit: 'e',
+            delete: 'd',
             open_in_pdfviewer: 'o',
         }
     }

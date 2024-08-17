@@ -6,6 +6,7 @@ pub enum KeyEvents {
     Previous,
     Bibtex,
     Edit,
+    Delete,
     Open,
     Quit,
 }
@@ -39,6 +40,8 @@ pub fn get_key_event(config: &Config) -> KeyEvents {
                         == crossterm::event::KeyCode::Char(config.keybinds.open_in_pdfviewer)
                     {
                         return KeyEvents::Open;
+                    } else if key.code == crossterm::event::KeyCode::Char(config.keybinds.delete) {
+                        return KeyEvents::Delete;
                     } else {
                         return KeyEvents::NoEvent;
                     }
