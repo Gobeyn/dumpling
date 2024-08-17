@@ -1,0 +1,37 @@
+#  ____                        _ _             
+# |  _ \ _   _ _ __ ___  _ __ | (_)_ __   __ _ 
+# | | | | | | | '_ ` _ \| '_ \| | | '_ \ / _` |
+# | |_| | |_| | | | | | | |_) | | | | | | (_| |
+# |____/ \__,_|_| |_| |_| .__/|_|_|_| |_|\__, |
+#                       |_|              |___/ 
+#
+# Author: Aaron Gobeyn
+# Date: August 17th 2024
+# Documentation: https://github.com/Gobeyn/dumpling
+
+[general]
+load_size = 30
+pdf_viewer = "zathura"
+selection_icon = ""
+
+[colors]
+master_block_title = [62,143,176] # Pine
+master_block_border = [235,111,146] # Love
+explorer_unselected_fg = [224,222,224] # Text
+explorer_unselected_bg = [42, 39, 63] # Surface
+explorer_selected_fg = [246,193,119] # Gold
+explorer_selected_bg = [57, 53, 82] # Overlay
+content_block_title = [235,111,146] # Love
+content_block_border = [62,143,176] # Pine
+title_content = [246,193,119] # Gold
+author_content = [196, 167, 231] # Iris
+description_content = [224, 222, 224] # Text
+ 
+[keybinds]
+quit = "q"
+next = "j"
+previous = "k"
+bibtex_to_clipboard = "b"
+edit = "e"
+delete = "d"
+open_in_pdfviewer = "o"

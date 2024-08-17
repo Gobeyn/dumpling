@@ -49,7 +49,15 @@ Note: The `--filter-tag` and `--list-tag` options have not yet been implemented.
 
 The user can create their own configuration for certain elements of the program with a configuration file. When starting the program, it will search 
 for the presence of `$HOME/.config/dumpling/dumpling.toml`, in case that file is not found, default settings will be used. The configuration `toml` 
-file consists of three section 
+file consists of three section, `[global]`, `[colors]` and `[keybinds]` each discussed below.
+
+An example configuration file is provided in `./examples/dumpling.toml`, which changes the default colors to the 
+[Rose Pine Moon colorscheme](https://rosepinetheme.com/palette/ingredients/). To use it, create the configuration directory and copy the 
+`dumpling.toml` file to it:
+```
+$ mkdir -p $HOME/.config/dumpling
+$ cp ./examples/dumpling.toml $HOME/.config/dumpling
+```
 
 ### Global
 
@@ -103,6 +111,7 @@ Note: all key binds are assumed the be single characters.
 - Fix issue where running `dumpling` without any arguments creates and saves a default paper entry.
 - Implement `--filter-tag` and `--list-tags` 
 - Show the paper tags in the TUI.
+- Add a way to check if any papers in the `pdf_dir` are not mentioned by the paper information files. 
 
 ## Why Dumpling
 
