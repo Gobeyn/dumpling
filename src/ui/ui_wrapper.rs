@@ -1,6 +1,7 @@
 use super::author;
 use super::description;
 use super::explorer;
+use super::tags;
 use super::title;
 use crate::configuration::config::Config;
 use crate::file::loader::Loader;
@@ -23,7 +24,14 @@ pub fn ui_pre_args<'a>(
         .split(frame.size());
 
         // Paper explorer UI
-        let explorer_block = Block::new()
+        let explorer_layout = Layout::new(
+            Direction::Vertical,
+            [Constraint::Percentage(85), Constraint::Percentage(15)],
+        )
+        .margin(2)
+        .split(master_layout[0]);
+
+        let explorer_master_block = Block::new()
             .title(" Paper Explorer ")
             .title_alignment(Alignment::Center)
             .title_style(
@@ -35,10 +43,39 @@ pub fn ui_pre_args<'a>(
             .borders(Borders::ALL)
             .border_style(Style::default().fg(config.colors.master_block_border));
 
+        let explorer_block = Block::new()
+            .title(" Titles ")
+            .title_alignment(Alignment::Center)
+            .title_style(
+                Style::default()
+                    .fg(config.colors.content_block_title)
+                    .add_modifier(Modifier::ITALIC),
+            )
+            .border_type(BorderType::Plain)
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(config.colors.content_block_border));
+
         let explorer_render = explorer::render(file_load, config, selected_idx);
         let explorer_paragraph = Paragraph::new(explorer_render)
             .block(explorer_block)
             .alignment(Alignment::Left);
+
+        let tag_block = Block::new()
+            .title(" Tags ")
+            .title_alignment(Alignment::Center)
+            .title_style(
+                Style::default()
+                    .fg(config.colors.content_block_title)
+                    .add_modifier(Modifier::ITALIC),
+            )
+            .border_type(BorderType::Plain)
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(config.colors.content_block_border));
+        let tag_render = tags::render(file_load, config, selected_idx);
+        let tag_paragraph = Paragraph::new(tag_render)
+            .block(tag_block)
+            .alignment(Alignment::Left)
+            .wrap(Wrap { trim: true });
         // Paper content viewer UI
         let content_layout = Layout::new(
             Direction::Vertical,
@@ -114,7 +151,9 @@ pub fn ui_pre_args<'a>(
             .alignment(Alignment::Left)
             .wrap(Wrap { trim: true });
 
-        frame.render_widget(explorer_paragraph, master_layout[0]);
+        frame.render_widget(explorer_master_block, master_layout[0]);
+        frame.render_widget(explorer_paragraph, explorer_layout[0]);
+        frame.render_widget(tag_paragraph, explorer_layout[1]);
         frame.render_widget(content_block, master_layout[1]);
         frame.render_widget(title_paragraph, content_layout[0]);
         frame.render_widget(author_paragraph, content_layout[1]);

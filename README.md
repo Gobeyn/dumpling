@@ -75,12 +75,12 @@ Under the `[colors]` section, the following can be configured:
 | explorer_unselected_bg | Background color of the unselected paper titles | Black |\
 | explorer_selected_fg | Text color of the selected paper titles | Blue |
 | explorer_selected_bg | Background color of the selected paper titles | Gray |
-| content_block_title | Color of the title of the three content blocks named "Title", "Authors" and "Description" | White |
-| content_block_border | Color of the border of the three content blocks | White |
+| content_block_title | Color of the title of the content blocks named "Title", "Authors", "Description", "Titles" and "Tags"| White |
+| content_block_border | Color of the border of the content blocks | White |
 | title_content | Text color of the text inside the "Title" block | White |
 | author_content | Text color of the text inside the "Author" block | White |
 | description_content | Text color of the text inside the "Description" block | White |
-
+| tag_content | Text color of the text inside the "Tags" block | White |
 Note: all colors are assumed to be of the form `[u8,u8,u8]`, representing
 RGB values.
 
@@ -104,7 +104,6 @@ Note: all key binds are assumed the be single characters.
 
 - Fix issue where deleting a file does not remove it from `Loader.valid_paths`, in some rare cases it may be possible to attempt a reload of 
     the file that no longer exists.
-- Show the paper tags in the TUI.
 - Add a way to check if any papers in the `pdf_dir` are not mentioned by the paper information files. 
 
 ## Why Dumpling

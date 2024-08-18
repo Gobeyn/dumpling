@@ -50,6 +50,7 @@ pub struct ColorsFromFile {
     pub title_content: Vec<u8>,
     pub author_content: Vec<u8>,
     pub description_content: Vec<u8>,
+    pub tag_content: Vec<u8>,
 }
 
 impl Default for ColorsFromFile {
@@ -66,6 +67,7 @@ impl Default for ColorsFromFile {
             title_content: vec![255, 255, 255],
             author_content: vec![255, 255, 255],
             description_content: vec![255, 255, 255],
+            tag_content: vec![255, 255, 255],
         }
     }
 }
@@ -86,6 +88,7 @@ pub struct TuiColors {
     pub title_content: Color,
     pub author_content: Color,
     pub description_content: Color,
+    pub tag_content: Color,
 }
 
 /// Macro that takes an instance of `ColorFromFile`, the `TuiColors`
@@ -130,7 +133,8 @@ impl TuiColors {
             content_block_border,
             title_content,
             author_content,
-            description_content
+            description_content,
+            tag_content
         );
         return tui_colors;
     }
