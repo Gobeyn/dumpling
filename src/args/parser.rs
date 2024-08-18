@@ -12,6 +12,7 @@ pub struct ProgFlags {
     pub open: bool,
     pub list_tags: bool,
     pub pdf_diagnostic: bool,
+    pub auto: bool,
 }
 
 /// Program arguments contained in a single structure, including
@@ -35,6 +36,7 @@ impl Default for ProgFlags {
             open: false,
             list_tags: false,
             pdf_diagnostic: false,
+            auto: false,
         }
     }
 }
@@ -155,11 +157,48 @@ pub fn parse_arguments() -> ProgArgs {
     opts.optflag("o", "open", "Open the TUI.");
     opts.optflag("", "list-tags", "Print all the tags used to the terminal.");
     opts.optflag("", "pdf-diagnose", "Show the file paths to all the invalid PDF links in the paper files and all the unused existing PDF files.");
+    opts.optflag(
+        "",
+        "auto",
+        "Use bibtex String to fill in the title, year and author fields.",
+    );
     opts.optflag("", "version", "Show package information.");
     opts.optflag("h", "help", "Print the help menu.");
 
     // Parse the arguments options
     let matches = opts.parse(&args[1..]).expect("Error parsing arguments");
+
+    // Auto needs to be done first, so it can be overwritten by
+    // explicit title, year and author arguments.
+    if matches.opt_present("auto") {
+        // This requires bibtex to be present
+        if matches.opt_present("b") {
+            // Parse the bibtex string
+            let bibtex_str = matches.opt_str("b").expect("Error with --bibtex");
+            let (title, year, authors) = extract_bibtex_fields(&bibtex_str);
+            match title {
+                Some(t) => {
+                    prog_args.title = t.clone();
+                    println!("Title: {}", t);
+                }
+                None => {}
+            }
+            match year {
+                Some(y) => {
+                    prog_args.year = y;
+                    println!("Year: {}", y);
+                }
+                None => {}
+            }
+            match authors {
+                Some(a) => {
+                    prog_args.authors = a.clone();
+                    println!("Authors: {:?}", a);
+                }
+                None => {}
+            }
+        }
+    }
 
     // Check if title is present
     if matches.opt_present("t") {
@@ -232,4 +271,84 @@ pub fn print_version() {
     println!("Author(s): {}", AUTHOR);
     println!("GitHub link: {}", REPOSITORY);
     println!("License: {}", LICENSE);
+}
+
+pub fn extract_bibtex_fields(
+    bibtex: &String,
+) -> (Option<String>, Option<i32>, Option<Vec<String>>) {
+    // Define the regular expression that will extract each fields
+    let title_re =
+        regex::Regex::new(r"(?i)title\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
+    let year_re =
+        regex::Regex::new(r"(?i)year\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
+    let author_re =
+        regex::Regex::new(r"(?i)author\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
+
+    // Get the matched title, None if there was no match.
+    let title: Option<String> = {
+        if title_re.is_match(bibtex) {
+            let caps = title_re.captures(bibtex);
+            match caps {
+                Some(c) => match c.get(1) {
+                    Some(s) => Some(s.as_str().to_string()),
+                    None => None,
+                },
+                None => None,
+            }
+        } else {
+            None
+        }
+    };
+    // Get the matched year, None if there was no match.
+    let year: Option<i32> = {
+        if year_re.is_match(bibtex) {
+            let caps = year_re.captures(bibtex);
+            match caps {
+                Some(c) => match c.get(1) {
+                    Some(s) => Some(s.as_str().parse::<i32>().unwrap()),
+                    None => None,
+                },
+                None => None,
+            }
+        } else {
+            None
+        }
+    };
+    // Get the authors string
+    let authors_str: Option<String> = {
+        if author_re.is_match(bibtex) {
+            let caps = author_re.captures(bibtex);
+            match caps {
+                Some(c) => match c.get(1) {
+                    Some(s) => Some(s.as_str().to_string()),
+                    None => None,
+                },
+                None => None,
+            }
+        } else {
+            None
+        }
+    };
+    // We assume the authors field follows to expected format:
+    // author={Doe, John and Smith, Jane and ...} and extract from
+    // that ["John Doe", "Jane Smith", ...]
+
+    let authors: Option<Vec<String>> = match authors_str {
+        Some(s) => Some(
+            s.split(" and ")
+                .map(|name| {
+                    let parts: Vec<&str> = name.split(',').map(|s| s.trim()).collect();
+                    if parts.len() == 2 {
+                        format!("{} {}", parts[1], parts[0])
+                    } else {
+                        name.to_string()
+                    }
+                })
+                .collect(),
+        ),
+        None => None,
+    };
+
+    // Return the parsed fields
+    return (title, year, authors);
 }
