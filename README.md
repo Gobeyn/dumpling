@@ -67,7 +67,7 @@ Only the paper titled Test will show up. We can see all the tags being used by r
 ```
 $ dumpling --list-tags
 ```
-In the first entry we made during this example, we set `--doc` to "Dudal_2024.pdf". We can see if this status of this file by running: 
+In the first entry we made during this example, we set `--doc` to "Dudal_2024.pdf". We can see the status of this file by running: 
 ```
 $ dumpling --pdf-diagnose
 ```
