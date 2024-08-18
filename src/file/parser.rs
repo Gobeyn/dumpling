@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::io::Read;
 
 /// Deserialization struct for parsing the paper Toml files.
@@ -80,35 +81,21 @@ pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
     return Some(paper);
 }
 
-/// Given a `Paper` Rust struct and a file path, write the struct
-/// to a Toml file specified by the file path.
-pub fn write_paper_to_toml(paper: &Paper, filepath: &std::path::PathBuf) {
-    let toml_str = toml::to_string(paper).expect("Error parsing Paper struct to Toml string");
-    std::fs::write(filepath, toml_str).expect("Error writing Toml file.");
-}
-
-/// Effectively the same as `write_paper_to_toml`, but it does some
-/// additional things. It mainly checks the directory where they file
-/// would be safed, and gives the Toml file that will be created a
-/// standardized name.
-pub fn write_new_paper(paper: &Paper, filedir: &std::path::PathBuf) {
-    let paths = match std::fs::read_dir(filedir) {
-        Ok(p) => p,
-        Err(_) => {
-            println!("Error trying to obtain paper information file paths.");
-            std::process::exit(1);
-        }
-    };
-    let num_files = paths.count();
-
-    // Create file path for new paper entry
-    let mut new_paper_filepath = filedir.clone();
-    if num_files == 0 {
-        new_paper_filepath.push("1.toml");
-    } else {
-        new_paper_filepath.push(format!("{}.toml", num_files + 1));
-    }
-
-    // Write the paper entry
-    write_paper_to_toml(paper, &new_paper_filepath);
+pub fn write_new_paper(paper: &Paper, folderdir: &std::path::PathBuf) {
+    // Convert the `Paper` struct into a toml formatted string.
+    let toml_str = toml::to_string(paper).expect("Error parsing Paper struct to Toml string.");
+    // Create unique file name to store the file under by hashing the byte content.
+    // Create new hasher instance
+    let mut hasher = Sha256::new();
+    // Hash the serialized Toml string
+    hasher.update(toml_str.as_bytes());
+    // Finalize hash and get result as byte array
+    let hash_bytes = hasher.finalize();
+    // Convert byte array to hexadecimal string
+    let file_name = format!("{}.toml", hex::encode(hash_bytes));
+    // Create file path for the saved paper
+    let mut file_path = folderdir.clone();
+    file_path.push(file_name);
+    // Save the file
+    std::fs::write(file_path, toml_str).expect("Error writing Toml file.");
 }

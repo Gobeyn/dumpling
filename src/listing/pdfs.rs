@@ -15,8 +15,8 @@ fn load_all_papers(folderdir: &std::path::PathBuf) -> Vec<Paper> {
     // Loop trough all files in the directory.
     let paths = std::fs::read_dir(folderdir).expect("Error obtaining file paths.");
     // Regex for the expected INT.toml format.
-    let re = regex::Regex::new(r"^(\d+)\.toml$").expect("Error building Regex.");
-    // Loop through the path.
+    let re = regex::Regex::new(r"^*\.toml$").expect("Error building Regex.");
+    // Loop through the paths
     for path in paths {
         let (file_name_os_string, mut file_path) = match path {
             Ok(p) => {

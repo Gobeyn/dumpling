@@ -13,7 +13,7 @@ pub fn get_all_valid_filepaths(
     // Loop trough all files in the directory.
     let paths = std::fs::read_dir(folderdir).expect("Error obtaining file paths.");
     // Define the expected form of the files.
-    let re = regex::Regex::new(r"^(\d+)\.toml$").expect("Error building Regex.");
+    let re = regex::Regex::new(r"^*\.toml$").expect("Error building Regex.");
     // Loop through all the paths, and add them to the vector
     for path in paths {
         let (file_name_os_string, file_path) = match path {
