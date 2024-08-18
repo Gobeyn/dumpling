@@ -142,6 +142,7 @@ Note: all key binds are assumed the be single characters.
     the file that no longer exists.
 - Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing assumes `kitty` and `neovim` are installed and 
     there is no configuration to change that. Similarly, only `wl-clipboard` is supported for copying bibtex contents into.
+- Add a program flag like `--auto` to use the information already present in the bibtex entry to get the title, year ans authors.
 
 ## Why Dumpling
 
