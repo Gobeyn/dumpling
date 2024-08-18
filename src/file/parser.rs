@@ -81,6 +81,9 @@ pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
     return Some(paper);
 }
 
+/// Given a particular instance of `Paper` and a file path to a folder,
+/// create a unique file name using SHA256 encoding on the file content bytes and
+/// store the serialized `Paper` instance as a *.toml file in the specified directory.
 pub fn write_new_paper(paper: &Paper, folderdir: &std::path::PathBuf) {
     // Convert the `Paper` struct into a toml formatted string.
     let toml_str = toml::to_string(paper).expect("Error parsing Paper struct to Toml string.");

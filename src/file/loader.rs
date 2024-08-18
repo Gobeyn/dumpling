@@ -2,7 +2,7 @@ use super::parser::{parse_paper_toml, Paper};
 use std::collections::VecDeque;
 use wl_clipboard_rs::copy::{MimeType, Options, Source};
 
-/// In the given `filedir`, look for all the files of the valid INT.toml format and
+/// In the given `filedir`, look for all the files of the valid *.toml format and
 /// store the path to them in a vector that is returned.
 pub fn get_all_valid_filepaths(
     folderdir: &std::path::PathBuf,

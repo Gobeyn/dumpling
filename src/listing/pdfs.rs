@@ -7,7 +7,7 @@ pub struct Pdf {
     pub invalid_paths: Vec<std::path::PathBuf>,
 }
 
-/// Create a vector of all the parsed paper entries with the valid INT.toml format looking only
+/// Create a vector of all the parsed paper entries with the valid *.toml format looking only
 /// in the given `folderdir` directory.
 fn load_all_papers(folderdir: &std::path::PathBuf) -> Vec<Paper> {
     // Initialise vector
