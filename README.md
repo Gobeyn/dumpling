@@ -100,7 +100,7 @@ Under the `[keybinds]` section, the following can be configured:
 | previous | Go to the previous paper in the explorer, if the maximum loaded papers is exceeded, the last paper will be unloaded | k |
 | bibtex_to_clipboard | Copy the `bibtex` part of the paper information into the system clipboard. Currently, `wl-clipboard` is used and nothing else is supported | b |
 | edit | Open Neovim in a new window with the currently selected paper information file. It is assumed `kitty` and `neovim` are installed. | e |
-| delete | Delete the currently selection paper file, it will also be unloaded. However, the PDF for it will not be deleted. | d |
+| delete | Delete the currently selection paper file, it will also be unloaded. However, the PDF for it will not be deleted. Warning: the TUI will not ask if you are sure, it immediately deletes the file. | d |
 | open_in_pdfviewer | Open the PDF file as pointed to by the currenly selected papers `docname` information with the `pdf_reader` set in the `general` section. The `pdf_dir` specified in the `general` section will be searched for this. | o |
 
 Note: all key binds are assumed the be single characters.
