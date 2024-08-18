@@ -39,6 +39,8 @@ arguments can be attached to it:
 | -o | --open | No argument | Open the TUI. |
 | / | --list-tags | No argument | List all the tags used and how often they appear. |
 | / | --pdf-diagnose | No argument | Show all the PDF file paths mentioned in the paper files that are invalid, i.e. the file it points to does not exists. Also show all the PDF files in the `pdf_dir` that are not mentioned by any paper file | 
+| -h | --help | No argument | Print the help menu. |
+| / | --version | No argument | Print package information |
 
 ## Configuration
 
