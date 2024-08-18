@@ -42,6 +42,37 @@ arguments can be attached to it:
 | -h | --help | No argument | Print the help menu. |
 | / | --version | No argument | Print package information |
 
+Here is an example usage:
+```
+$ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditions and Duality: a Field Theoretic Approach" -y 2024 --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" -b "@article{dudal2024casimir,
+  title={The Casimir energy with perfect electromagnetic boundary conditions and duality: a field-theoretic approach},
+  author={Dudal, David and Gobeyn, Aaron and Oosthuyse, Thomas and Stouten, Sebbe and Vercauteren, David},
+  journal={arXiv preprint arXiv:2406.19743},
+  year={2024}
+}" --doc "Dudal_2024.pdf" -a "David Dudal" -a "Aaron Gobeyn" -a "Thomas Oosthuyse" -a "Sebbe Stouten" -a "David Vercauteren" --tag "Casimir" --tag "PEMC" --tag "EM tensor" --tag "Path integral"
+```
+Running it will create a new paper information file, stored in `$HOME/.paper` directory. The file name will not be recognizable because it is created by SHA256 encoding of the file contents. If we then run:
+```
+$ dumpling -o
+```
+We will see this paper as inside the TUI. By pressing `b` the bibtex citation for this paper will be put into the system clipboard, and can be pasted where needed. Suppose we made made a second entry: 
+```
+$ dumpling -t "Title" --tag "Tag"
+```
+If we open the TUI as before, both papers will appear, but if instead we run:
+```
+$ dumpling -o --filter-tag "Tag"
+```
+Only the paper titled Test will show up. We can see all the tags being used by running: 
+```
+$ dumpling --list-tags
+```
+In the first entry we made during this example, we set `--doc` to "Dudal_2024.pdf". We can see if this status of this file by running: 
+```
+$ dumpling --pdf-diagnose
+```
+This will tell us if there are any PDF files mentioned by the paper information files that are not present in `$HOME/.paper/`, and if there are any files in that directory that are not mentioned by a paper information file.
+
 ## Configuration
 
 The user can create their own configuration for certain elements of the program with a configuration file. When starting the program, it will search 
