@@ -260,11 +260,13 @@ pub fn parse_arguments() -> ProgArgs {
     return prog_args;
 }
 
+/// Using the information provided by the `Options`, print a help message to the terminal for all
+/// the options and how they should be used.
 pub fn print_help(program: &str, opts: getopts::Options) {
     let brief = format!("Usage: {} [options]", program);
     print!("{}", opts.usage(&brief));
 }
-
+/// Print some program information to the terminal.
 pub fn print_version() {
     println!("Version: {}", VERSION);
     println!("Package: {}", NAME);
@@ -272,7 +274,8 @@ pub fn print_version() {
     println!("GitHub link: {}", REPOSITORY);
     println!("License: {}", LICENSE);
 }
-
+/// Given a bibtex format string, extract from it the title, year and authors. If any of these
+/// extractions fail, None is return for that field.
 pub fn extract_bibtex_fields(
     bibtex: &String,
 ) -> (Option<String>, Option<i32>, Option<Vec<String>>) {
@@ -332,15 +335,17 @@ pub fn extract_bibtex_fields(
     // We assume the authors field follows to expected format:
     // author={Doe, John and Smith, Jane and ...} and extract from
     // that ["John Doe", "Jane Smith", ...]
-
     let authors: Option<Vec<String>> = match authors_str {
         Some(s) => Some(
+            // Split into ["Doe, John", "Smith, Jane", ...]
             s.split(" and ")
+                // For each name (e.g. Doe, John) split into first and last name (e.g. ["Doe", "John"])
                 .map(|name| {
                     let parts: Vec<&str> = name.split(',').map(|s| s.trim()).collect();
                     if parts.len() == 2 {
                         format!("{} {}", parts[1], parts[0])
                     } else {
+                        // If the name does not fit the expected format, just use it as is.
                         name.to_string()
                     }
                 })

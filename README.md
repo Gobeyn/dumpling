@@ -39,6 +39,7 @@ arguments can be attached to it:
 | -o | --open | No argument | Open the TUI. |
 | / | --list-tags | No argument | List all the tags used and how often they appear. |
 | / | --pdf-diagnose | No argument | Show all the PDF file paths mentioned in the paper files that are invalid, i.e. the file it points to does not exists. Also show all the PDF files in the `pdf_dir` that are not mentioned by any paper file | 
+| / | --auto | No argument | If `--bibtex` is provided, the contents of it are used to automatically infer `--title`, `--year` and all the `--authors`. The result can be overwritten by using those flags anyway. | 
 | -h | --help | No argument | Print the help menu. |
 | / | --version | No argument | Print package information |
 
@@ -51,7 +52,18 @@ $ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditio
   year={2024}
 }" --doc "Dudal_2024.pdf" -a "David Dudal" -a "Aaron Gobeyn" -a "Thomas Oosthuyse" -a "Sebbe Stouten" -a "David Vercauteren" --tag "Casimir" --tag "PEMC" --tag "EM tensor" --tag "Path integral"
 ```
-Running it will create a new paper information file, stored in `$HOME/.paper` directory. The file name will not be recognizable because it is created by SHA256 encoding of the file contents. If we then run:
+Running it will create a new paper information file, stored in `$HOME/.paper` directory. The file name will not be recognizable because it is created by SHA256 encoding of the file contents. 
+The same result can be achieved utilising the `--auto` flag,
+```
+$ dumpling --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" 
+-b "@article{dudal2024casimir,
+  title={The Casimir energy with perfect electromagnetic boundary conditions and duality: a field-theoretic approach},
+  author={Dudal, David and Gobeyn, Aaron and Oosthuyse, Thomas and Stouten, Sebbe and Vercauteren, David},
+  journal={arXiv preprint arXiv:2406.19743},
+  year={2024}
+}" --doc "Dudal_2024.pdf" --tag "Casimir" --tag "PEMC" --tag "EM tensor" --tag "Path integral"
+```
+The title, year and authors of the paper are inferred from the given bibtex citation. If we then run:
 ```
 $ dumpling -o
 ```
@@ -138,11 +150,11 @@ Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-- Fix issue where deleting a file does not remove it from `Loader.valid_paths`, in some rare cases it may be possible to attempt a reload of 
+- Fix issue where deleting a file does not remove it from `Loader.valid_paths`, in some cases it may be possible to attempt a reload of 
     the file that no longer exists.
 - Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing assumes `kitty` and `neovim` are installed and 
     there is no configuration to change that. Similarly, only `wl-clipboard` is supported for copying bibtex contents into.
-- Add a program flag like `--auto` to use the information already present in the bibtex entry to get the title, year ans authors.
+- Add a "Published by: JOURNAL" part to the TUI, probably under the author block where "Published: YEAR" is written.
 
 ## Why Dumpling
 
