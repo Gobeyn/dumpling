@@ -33,17 +33,11 @@ arguments can be attached to it:
 | / | --desc | "\[DESCRIPTION\]" | Short description of the papers contents |
 | -b | --bibtex | '''\[BIB\]''' | Bibtex formatted reference for the paper |
 | / | --doc | "\[DOCNAME\]" | Name of the PDF document, the directory is set in the configuration file and should not be provided |
-| / | --filter-tag | "\[TAG\]" |Show only papers with certain tag. NOTE: this has not been implemented yet.|
+| / | --filter-tag | "\[TAG\]" |Show only papers with certain tag. This only does something if the TUI is opened.|
 | -a | --author | "\[AUTHOR\]" | Add author for the paper, this option can be used multiple times. |
 | / | --tag | "\[TAG\]" | Add tag to paper, this option can be used multiple times. |
 | -o | --open | No argument | Open the TUI. |
 | / | --list-tags | No argument | List all the tags used and how often they appear. |
-
-Note: If you run `dumpling` without any arguments, a default paper 
-information entry will be generated. We suggest not using it until we fix 
-this behaviour.
-
-Note: The `--filter-tag` option has not yet been implemented.
 
 ## Configuration
 
