@@ -160,7 +160,7 @@ pub fn parse_arguments() -> ProgArgs {
     opts.optflag(
         "",
         "auto",
-        "Use bibtex String to fill in the title, year and author fields.",
+        "Use bibtex String to fill in the title, year and author fields. This requires --bibtex to be used.",
     );
     opts.optflag("", "version", "Show package information.");
     opts.optflag("h", "help", "Print the help menu.");
