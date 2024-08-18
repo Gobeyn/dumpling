@@ -32,7 +32,7 @@ impl Default for Paper {
         Paper {
             title: String::new(),
             year: 0,
-            description: String::from("Paper has not been read yet."),
+            description: String::new(),
             bibtex: String::new(),
             docname: String::new(),
             authors: Vec::new(),
@@ -43,7 +43,7 @@ impl Default for Paper {
 
 /// Given the file path to a paper Toml file, parse the file contents into
 /// the `Paper` Rust struct. If any step failed, `None` is returned.
-pub fn parse_paper_toml(filepath: &mut std::path::PathBuf) -> Option<Paper> {
+pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
     // Attempt to open the file
     let mut file = match std::fs::File::open(filepath) {
         Ok(v) => v,

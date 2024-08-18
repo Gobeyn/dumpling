@@ -37,13 +37,13 @@ arguments can be attached to it:
 | -a | --author | "\[AUTHOR\]" | Add author for the paper, this option can be used multiple times. |
 | / | --tag | "\[TAG\]" | Add tag to paper, this option can be used multiple times. |
 | -o | --open | No argument | Open the TUI. |
-| / | --list-tags | No argument | List all the tags used. NOTE: this has not been implemented yet. |
+| / | --list-tags | No argument | List all the tags used and how often they appear. |
 
 Note: If you run `dumpling` without any arguments, a default paper 
 information entry will be generated. We suggest not using it until we fix 
 this behaviour.
 
-Note: The `--filter-tag` and `--list-tag` options have not yet been implemented.
+Note: The `--filter-tag` option has not yet been implemented.
 
 ## Configuration
 
@@ -108,8 +108,8 @@ Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-- Fix issue where running `dumpling` without any arguments creates and saves a default paper entry.
-- Implement `--filter-tag` and `--list-tags` 
+- Fix issue where deleting a file does not remove it from `Loader.valid_paths`, in some rare cases it may be possible to attempt a reload of 
+    the file that no longer exists.
 - Show the paper tags in the TUI.
 - Add a way to check if any papers in the `pdf_dir` are not mentioned by the paper information files. 
 

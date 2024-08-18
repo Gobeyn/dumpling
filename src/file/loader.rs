@@ -2,126 +2,178 @@ use super::parser::{parse_paper_toml, Paper};
 use std::collections::VecDeque;
 use wl_clipboard_rs::copy::{MimeType, Options, Source};
 
-/// Instead of loading the entire directory where paper Toml files
-/// are stored, only a portion is loaded. This is handled and saved
-/// in the `Loader` struct.
+/// In the given `filedir`, look for all the files of the valid INT.toml format and
+/// store the path to them in a vector that is returned.
+pub fn get_all_valid_filepaths(
+    folderdir: &std::path::PathBuf,
+    tag_filter: &Option<String>,
+) -> Vec<std::path::PathBuf> {
+    // Initialise vector
+    let mut all_file_paths: Vec<std::path::PathBuf> = Vec::new();
+    // Loop trough all files in the directory.
+    let paths = std::fs::read_dir(folderdir).expect("Error obtaining file paths.");
+    // Define the expected form of the files.
+    let re = regex::Regex::new(r"^(\d+)\.toml$").expect("Error building Regex.");
+    // Loop through all the paths, and add them to the vector
+    for path in paths {
+        let (file_name_os_string, file_path) = match path {
+            Ok(p) => (p.file_name(), p.path()),
+            Err(_) => {
+                continue;
+            }
+        };
+        let file_name = file_name_os_string.to_str().unwrap();
+        if re.is_match(&file_name) {
+            match tag_filter {
+                Some(tag) => {
+                    // Parse the paper
+                    let paper = match parse_paper_toml(&file_path) {
+                        Some(p) => p,
+                        None => {
+                            continue;
+                        }
+                    };
+                    // Check if any of the tags matches the given tag
+                    for tag_paper in &paper.tags {
+                        if *tag == tag_paper.label {
+                            // If the tag is present, include it in the valid paths
+                            all_file_paths.push(file_path);
+                            break;
+                        }
+                    }
+                }
+                None => {
+                    all_file_paths.push(file_path);
+                }
+            }
+        }
+    }
+    return all_file_paths;
+}
+
+/// Loader struct that makes sure not every paper is loaded at the beginning of the
+/// program and only loads a new paper if and when we need it.
+///
+/// The `valid_paths` field contains the paths to all the paper files that could be loaded.
+/// The `loaded_paths` field contains index pointers to `valid_paths` with the currently loaded
+/// paths.
+/// The `paper` field contains the parsed `Paper` structs of the loaded paths specified by
+/// `loaded_paths`.
 #[derive(Clone, Debug)]
 pub struct Loader {
-    pub file_paths: VecDeque<std::path::PathBuf>,
+    pub valid_paths: Vec<std::path::PathBuf>,
+    pub loaded_paths: VecDeque<usize>,
     pub papers: VecDeque<Paper>,
 }
 
 impl Loader {
-    /// Given the directory where the paper Toml files are stored,
-    /// along with a starting index for the standerdized file naming
-    /// INT.toml and the amount of files to load, create the `Loader`
-    /// struct containing the parsed file contents and loaded file
-    /// directories.
-    pub fn load_tomls(start: i32, load: i32, filedir: &mut std::path::PathBuf) -> Self {
-        let end = start + load;
-        let mut file_paths: VecDeque<std::path::PathBuf> = VecDeque::new();
+    /// Given a load size and the directory where the paper information
+    /// files are stored, create a new instance of `Loader`. The
+    /// `loaded_paths` will be as large as possible, bounded by the
+    /// `load` parameter.
+    pub fn load(load: i32, folderdir: &std::path::PathBuf, tag_filter: &Option<String>) -> Self {
+        // Initialise the `Loader` fields.
+        let valid_paths = get_all_valid_filepaths(folderdir, tag_filter);
+        let mut loaded_paths: VecDeque<usize> = VecDeque::new();
         let mut papers: VecDeque<Paper> = VecDeque::new();
 
-        for i in start..=end {
-            let mut file_path = filedir.clone();
-            file_path.push(format!("{}.toml", i));
-            if file_path.exists() {
-                let paper = match parse_paper_toml(&mut file_path) {
-                    Some(p) => p,
-                    None => {
-                        continue;
-                    }
-                };
-                papers.push_back(paper);
-                file_paths.push_back(file_path);
-            }
+        for i in 0..=load {
+            let file_path = match valid_paths.get(i as usize) {
+                Some(p) => p,
+                None => {
+                    continue;
+                }
+            };
+            let paper = match parse_paper_toml(file_path) {
+                Some(p) => p,
+                None => {
+                    continue;
+                }
+            };
+            loaded_paths.push_back(i as usize);
+            papers.push_back(paper);
         }
 
-        return Loader { file_paths, papers };
+        return Loader {
+            valid_paths,
+            loaded_paths,
+            papers,
+        };
     }
-    /// Load the next paper Toml file following the standerdized
-    /// convention INT.toml. The maximum load is respected by
-    /// unloading the first entry.
-    pub fn load_next(&mut self, filedir: &std::path::PathBuf) {
-        // Check if file_paths is empty, if so, leave.
-        if self.file_paths.is_empty() {
+    /// Load the next paper, if there is another valid paper to load.
+    pub fn load_next(&mut self) {
+        // Check if there is even anything to load, if not, exit.
+        if self.valid_paths.is_empty() {
             return;
         }
-
-        let last_load: &std::path::PathBuf = match self.file_paths.back() {
+        // Get the last loaded index
+        let last_load: usize = match self.loaded_paths.back() {
+            Some(v) => *v,
+            None => {
+                return;
+            }
+        };
+        // Get the next load path if possible.
+        let new_load_path = match self.valid_paths.get(last_load + 1) {
             Some(p) => p,
             None => {
                 return;
             }
         };
-        let num_last_load = match num_from_filepath(last_load) {
-            Some(n) => n,
-            None => {
-                return;
-            }
-        };
-        let mut path_next_load = filedir.clone();
-        path_next_load.push(format!("{}.toml", num_last_load + 1));
-        if path_next_load.exists() {
-            // Create new paper
-            let paper: Paper = match parse_paper_toml(&mut path_next_load) {
-                Some(p) => p,
-                None => {
-                    return;
-                }
-            };
-            // Pop first element out
-            self.file_paths.pop_front();
-            self.papers.pop_front();
-            // Add new file path and new paper to the back
-            self.file_paths.push_back(path_next_load);
-            self.papers.push_back(paper);
-        }
-    }
-    /// Load the previous paper Toml file following the standerdized
-    /// convention INT.toml. The maximum load is respected by
-    /// unloading the last entry.
-    pub fn load_previous(&mut self, filedir: &std::path::PathBuf) {
-        // Check if file_paths is empty, if so, leave.
-        if self.file_paths.is_empty() {
-            return;
-        }
-        // Get the first path
-        let first_load: &std::path::PathBuf = match self.file_paths.front() {
+        // Load the paper
+        let paper = match parse_paper_toml(new_load_path) {
             Some(p) => p,
             None => {
                 return;
             }
         };
-        // Extract number from it
-        let num_first_load: i32 = match num_from_filepath(first_load) {
-            Some(n) => n,
+        // Keep the load size by unloading the first elements and
+        // adding the new elements
+        self.loaded_paths.pop_front();
+        self.papers.pop_front();
+        self.loaded_paths.push_back(last_load + 1);
+        self.papers.push_back(paper);
+    }
+    /// Load the previous paper, if there is a previous paper to load.
+    pub fn load_previous(&mut self) {
+        // Check if there is even anything to load, if not, exit.
+        if self.valid_paths.is_empty() {
+            return;
+        }
+        // Get the first loaded index
+        let first_load: usize = match self.loaded_paths.front() {
+            Some(v) => *v,
             None => {
                 return;
             }
         };
-        // Check if previous number is larger then the program minimum of 1.
-        if num_first_load <= 1 {
+        // Get the new load path if possible
+        if first_load <= 0 {
             return;
         }
-        // If not it is safe to proceed
-        let mut path_prev_load = filedir.clone();
-        path_prev_load.push(format!("{}.toml", num_first_load - 1));
-        if path_prev_load.exists() {
-            // Create new paper
-            let paper = match parse_paper_toml(&mut path_prev_load) {
-                Some(p) => p,
-                None => {
-                    return;
-                }
-            };
-            // Remove path and paper from the back
-            self.file_paths.pop_back();
-            self.papers.pop_back();
-            // Add new path and paper to the front
-            self.file_paths.push_front(path_prev_load);
-            self.papers.push_front(paper);
+        let new_load_path = match self.valid_paths.get(first_load - 1) {
+            Some(p) => p,
+            None => {
+                return;
+            }
+        };
+        // Load the new paper
+        let paper = match parse_paper_toml(new_load_path) {
+            Some(p) => p,
+            None => {
+                return;
+            }
+        };
+        // Check if there is even anything to load, if not, exit.
+        if self.valid_paths.is_empty() {
+            return;
         }
+        // Keep the load size by unloading the last entries and adding
+        // the new elements to the front.
+        self.loaded_paths.pop_back();
+        self.papers.pop_back();
+        self.loaded_paths.push_front(first_load - 1);
+        self.papers.push_front(paper);
     }
     /// Given an index in the `Loader.papers` vector, copy the
     /// contents of the `Paper.bibtex` field to the system clipboard.
@@ -147,23 +199,29 @@ impl Loader {
             }
         }
     }
-    /// Given an index in the `Loader.file_paths` vector, open
-    /// the file path contained at that location with Neovim.
-    /// This method assumes that the `kitty` terminal emulator and
-    /// `neovim` file editor are installed.
+    /// Open the paper pointed at by `selected_idx` in Neovim.
+    /// Note that this function assumes `kitty` and `nvim` are
+    /// installed.
     pub fn open_file_in_editor(&self, selected_idx: usize) {
-        // Get selected filepath
-        let filepath = match self.file_paths.get(selected_idx) {
-            Some(f) => f.clone(),
+        // Get the file path pointer
+        let fp_pointer = match self.loaded_paths.get(selected_idx) {
+            Some(i) => *i,
             None => {
                 return;
             }
         };
-        // Open file in editor in a new window, note that the terminal and editor are hard coded.
+        // Get the file path
+        let file_path = match self.valid_paths.get(fp_pointer) {
+            Some(p) => p.clone(),
+            None => {
+                return;
+            }
+        };
+        // Open the file in Neovim
         match std::process::Command::new("kitty")
             .arg("--detach")
             .arg("nvim")
-            .arg(filepath)
+            .arg(file_path)
             .spawn()
         {
             Ok(_) => {
@@ -174,30 +232,33 @@ impl Loader {
             }
         }
     }
-    /// Given an index in the `Loader.papers`, a PDF-viewer and a
-    /// directory where the PDF files are stored, open the pointed at
-    /// `pdf_dir/Papers.docname` file with the provided `pdf_viewer`.
+    /// Open the PDF file stored in the currently selected paper
+    /// struct. The `pdf_dir` tells us in which directory to look
+    /// for the file name of the PDF and `pdf_viewer` tells us which
+    /// PDF viewer to use in opening the PDF file.
     pub fn open_file_in_pdfviewer(
         &self,
         selected_idx: usize,
         pdf_viewer: &String,
         pdf_dir: &String,
     ) {
-        // Get file name from the paper content
-        let filename = match self.papers.get(selected_idx) {
+        // Get the document name of the currently selected paper.
+        let file_name = match self.papers.get(selected_idx) {
             Some(p) => p.docname.clone(),
             None => {
                 return;
             }
         };
-        // Create path to that file with pdf_dir as directory
-        let mut filepath = std::path::PathBuf::from(pdf_dir);
-        filepath.push(filename);
-
-        // Check if that file exists
-        if filepath.exists() {
-            // Open in given PDF viewer.
-            match std::process::Command::new(pdf_viewer).arg(filepath).spawn() {
+        // Create path to that file using the given `pdf_dir`
+        let mut file_path = std::path::PathBuf::from(pdf_dir);
+        file_path.push(file_name);
+        // Check that the file exists, then open it in the provided
+        // `pdf_viewer`.
+        if file_path.exists() {
+            match std::process::Command::new(pdf_viewer)
+                .arg(file_path)
+                .spawn()
+            {
                 Ok(_) => {
                     return;
                 }
@@ -207,69 +268,36 @@ impl Loader {
             }
         }
     }
-    /// Given an index in the `Loader.file_paths` vector, delete the
-    /// file that index points to. That file is also removed from the
-    /// loader.
+    /// Remove the currently selected file, and remove it from the
+    /// loader
+    ///
+    /// Note: Currently it is not removed from the `valid_paths` field,
+    /// this can cause some weird behaviour in some instances. We
+    /// will add this later, however, this requires some further
+    /// attention as changes to the `loaded_paths` field will also need
+    /// to be changed.
     pub fn remove_file(&mut self, selected_idx: usize) {
-        // Get the file path
-        let filepath = match self.file_paths.get(selected_idx) {
-            Some(f) => f.clone(),
+        // Get the file path pointer
+        let fp_pointer = match self.loaded_paths.get(selected_idx) {
+            Some(i) => *i,
             None => {
                 return;
             }
         };
-        // Check if it exists
-        if filepath.exists() {
-            // Delete it
-            std::fs::remove_file(filepath).expect("Error attempting to remove file.");
-            // Remove file path and paper from the loader
-            self.file_paths.remove(selected_idx);
-            self.papers.remove(selected_idx);
-        }
-    }
-}
-
-/// Given a file path where the file name is of the form `INT.toml`,
-/// extract the `INT` from it. If the file name is not of the required
-/// format, or anything went wrong, None is returned.
-pub fn num_from_filepath(filepath: &std::path::PathBuf) -> Option<i32> {
-    let file_name_os_string = match filepath.file_name() {
-        Some(f) => f,
-        None => {
-            return None;
-        }
-    };
-
-    let file_name = match file_name_os_string.to_str() {
-        Some(s) => s,
-        None => {
-            return None;
-        }
-    };
-
-    let re = match regex::Regex::new(r"^(\d+)\.toml$") {
-        Ok(r) => r,
-        Err(_) => {
-            return None;
-        }
-    };
-
-    if re.is_match(&file_name) {
-        let caps = match re.captures(&file_name) {
-            Some(c) => c,
+        // Get the file path
+        let file_path = match self.valid_paths.get(fp_pointer) {
+            Some(p) => p.clone(),
             None => {
-                return None;
+                return;
             }
         };
-        match caps[1].parse::<i32>() {
-            Ok(n) => {
-                return Some(n);
-            }
-            Err(_) => {
-                return None;
-            }
+        // Check if the file exists
+        if file_path.exists() {
+            // Delete the file
+            std::fs::remove_file(file_path).expect("Error attempting to remove file");
+            // Remove it from the loader
+            self.loaded_paths.remove(selected_idx);
+            self.papers.remove(selected_idx);
         }
-    } else {
-        return None;
     }
 }

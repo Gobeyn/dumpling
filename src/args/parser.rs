@@ -1,7 +1,7 @@
 use super::super::file;
 
 /// Summary of boolean program arguments.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProgFlags {
     pub open: bool,
     pub list_tags: bool,
@@ -9,7 +9,7 @@ pub struct ProgFlags {
 
 /// Program arguments contained in a single structure, including
 /// boolean flags, which are summarised by `ProgFlags`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProgArgs {
     pub title: String,
     pub year: i32,
@@ -48,8 +48,24 @@ impl Default for ProgArgs {
 }
 
 impl ProgArgs {
+    /// Check if struct is any different from the default.
+    pub fn is_default(&self) -> bool {
+        if *self == Self::default() {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /// Convert subset of `ProgArgs` fields into `Paper` struct.
-    pub fn to_paper(&self) -> file::parser::Paper {
+    pub fn to_paper(&self) -> Option<file::parser::Paper> {
+        // Check of the program arguments are any different from the default, i.e. if the user
+        // specified any fields.
+        if self.is_default() {
+            return None;
+        }
+
+        // Format the authors and tags
         let mut author_vec: Vec<file::parser::Author> = Vec::new();
         let mut tag_vec: Vec<file::parser::Tag> = Vec::new();
 
@@ -62,7 +78,8 @@ impl ProgArgs {
             tag_vec.push(tag);
         }
 
-        file::parser::Paper {
+        // Take subset from the program arguments and pass them to the paper.
+        let paper = file::parser::Paper {
             title: self.title.clone(),
             year: self.year,
             description: self.description.clone(),
@@ -70,7 +87,8 @@ impl ProgArgs {
             docname: self.docname.clone(),
             authors: author_vec,
             tags: tag_vec,
-        }
+        };
+        return Some(paper);
     }
 }
 

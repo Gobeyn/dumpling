@@ -7,7 +7,7 @@ use crate::key::event;
 /// of the current terminal session with `crossterm` and subsequently
 /// render the TUI with `ratatui`. All the key binded actions are also
 /// called here.
-pub fn create_window(file_load: &mut Loader, config: &Config, filedir: &std::path::PathBuf) {
+pub fn create_window(file_load: &mut Loader, config: &Config) {
     // Enable raw mode, disabling user input like typing
     crossterm::terminal::enable_raw_mode().expect("Error enabling raw mode.");
     // Create alternate screen on top of current terminal session
@@ -30,15 +30,17 @@ pub fn create_window(file_load: &mut Loader, config: &Config, filedir: &std::pat
                 run = false;
             }
             event::KeyEvents::Next => {
-                file_load.load_next(filedir);
-                if file_pointer >= file_load.papers.len() - 1 {
+                file_load.load_next();
+                if file_load.papers.is_empty() {
+                    file_pointer = 0;
+                } else if file_pointer >= file_load.papers.len() - 1 {
                     file_pointer = file_load.papers.len() - 1;
                 } else {
                     file_pointer += 1;
                 }
             }
             event::KeyEvents::Previous => {
-                file_load.load_previous(filedir);
+                file_load.load_previous();
                 if file_pointer <= 1 {
                     file_pointer = 0;
                 } else {
