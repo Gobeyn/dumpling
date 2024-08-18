@@ -109,6 +109,8 @@ Note: all key binds are assumed the be single characters.
 
 - Fix issue where deleting a file does not remove it from `Loader.valid_paths`, in some rare cases it may be possible to attempt a reload of 
     the file that no longer exists.
+- Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing assumes `kitty` and `neovim` are installed and 
+    there is no configuration to change that. Similarly, only `wl-clipboard` is supported for copying bibtex contents into.
 
 ## Why Dumpling
 
