@@ -9,6 +9,7 @@ use args::parser::{parse_arguments, ProgArgs};
 use configuration::config::Config;
 use file::loader::Loader;
 use file::parser::write_new_paper;
+use listing::pdfs::pdf_diagnostic;
 use listing::tags::list_tags;
 use ui::window::create_window;
 
@@ -44,6 +45,8 @@ fn main() {
     } else {
         if prog_args.flags.list_tags {
             list_tags(&folderdir);
+        } else if prog_args.flags.pdf_diagnostic {
+            pdf_diagnostic(&folderdir, &config.general.pdf_dir);
         } else {
             // If we get here, it is assumed a new entry is added. We will only add it if
             // any program arguments were set.

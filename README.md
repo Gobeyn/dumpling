@@ -38,6 +38,7 @@ arguments can be attached to it:
 | / | --tag | "\[TAG\]" | Add tag to paper, this option can be used multiple times. |
 | -o | --open | No argument | Open the TUI. |
 | / | --list-tags | No argument | List all the tags used and how often they appear. |
+| / | --pdf-diagnose | No argument | Show all the PDF file paths mentioned in the paper files that are invalid, i.e. the file it points to does not exists. Also show all the PDF files in the `pdf_dir` that are not mentioned by any paper file | 
 
 ## Configuration
 
@@ -81,6 +82,7 @@ Under the `[colors]` section, the following can be configured:
 | author_content | Text color of the text inside the "Author" block | White |
 | description_content | Text color of the text inside the "Description" block | White |
 | tag_content | Text color of the text inside the "Tags" block | White |
+
 Note: all colors are assumed to be of the form `[u8,u8,u8]`, representing
 RGB values.
 
@@ -104,7 +106,6 @@ Note: all key binds are assumed the be single characters.
 
 - Fix issue where deleting a file does not remove it from `Loader.valid_paths`, in some rare cases it may be possible to attempt a reload of 
     the file that no longer exists.
-- Add a way to check if any papers in the `pdf_dir` are not mentioned by the paper information files. 
 
 ## Why Dumpling
 

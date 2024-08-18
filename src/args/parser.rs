@@ -1,10 +1,17 @@
 use super::super::file;
 
+const NAME: &str = env!("CARGO_PKG_NAME");
+const AUTHOR: &str = env!("CARGO_PKG_AUTHORS");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+const LICENSE: &str = env!("CARGO_PKG_LICENSE");
+const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
+
 /// Summary of boolean program arguments.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProgFlags {
     pub open: bool,
     pub list_tags: bool,
+    pub pdf_diagnostic: bool,
 }
 
 /// Program arguments contained in a single structure, including
@@ -27,6 +34,7 @@ impl Default for ProgFlags {
         ProgFlags {
             open: false,
             list_tags: false,
+            pdf_diagnostic: false,
         }
     }
 }
@@ -99,6 +107,7 @@ pub fn parse_arguments() -> ProgArgs {
     let args: Vec<String> = std::env::args().collect();
     let mut prog_args: ProgArgs = ProgArgs::default();
     let mut opts = getopts::Options::new();
+    let program = args[0].clone();
 
     // Define the program options
     opts.optopt("t", "title", "Title of paper", "STRING (in double quotes)");
@@ -124,7 +133,7 @@ pub fn parse_arguments() -> ProgArgs {
     opts.optopt(
         "",
         "filter-tag",
-        "Filter the papers by a tag.",
+        "Filter the papers by a tag. This only does something if the TUI is opened.",
         "STRING (in double quotes)",
     );
 
@@ -144,7 +153,10 @@ pub fn parse_arguments() -> ProgArgs {
 
     // Boolean flags
     opts.optflag("o", "open", "Open the TUI.");
-    opts.optflag("", "list-tags", "Print all the tags used to the terminal");
+    opts.optflag("", "list-tags", "Print all the tags used to the terminal.");
+    opts.optflag("", "pdf-diagnose", "Show the file paths to all the invalid PDF links in the paper files and all the unused existing PDF files.");
+    opts.optflag("", "version", "Show package information.");
+    opts.optflag("h", "help", "Print the help menu.");
 
     // Parse the arguments options
     let matches = opts.parse(&args[1..]).expect("Error parsing arguments");
@@ -197,5 +209,27 @@ pub fn parse_arguments() -> ProgArgs {
     if matches.opt_present("list-tags") {
         prog_args.flags.list_tags = !prog_args.flags.list_tags;
     }
+    if matches.opt_present("pdf-diagnose") {
+        prog_args.flags.pdf_diagnostic = !prog_args.flags.pdf_diagnostic;
+    }
+    if matches.opt_present("version") {
+        print_version();
+    }
+    if matches.opt_present("h") {
+        print_help(&program, opts);
+    }
     return prog_args;
+}
+
+pub fn print_help(program: &str, opts: getopts::Options) {
+    let brief = format!("Usage: {} [options]", program);
+    print!("{}", opts.usage(&brief));
+}
+
+pub fn print_version() {
+    println!("Version: {}", VERSION);
+    println!("Package: {}", NAME);
+    println!("Author(s): {}", AUTHOR);
+    println!("GitHub link: {}", REPOSITORY);
+    println!("License: {}", LICENSE);
 }
