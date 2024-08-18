@@ -55,6 +55,7 @@ An example configuration file is provided in `./examples/dumpling.toml`, which c
 $ mkdir -p $HOME/.config/dumpling
 $ cp ./examples/dumpling.toml $HOME/.config/dumpling
 ```
+Note: Using this configuration requires a [NerdFont](https://github.com/ryanoasis/nerd-fonts) to be installed.
 
 ### Global
 
@@ -65,7 +66,7 @@ Under the `[global]` section, the following can be configured:
 | load_size | 32-bit integer | Amount of files loaded when TUI is opened. | 30 |
 | pdf_viewer | String | PDF viewer to use when attempting to open the paper PDF. | zathura |
 | pdf_dir | String | Directory to search for paper PDF files. Aliases such a `$HOME` and `~` are not supported, so direct paths must be provided | $HOME/.paper/ |
-| selection_icon | Char | Single character to put in front of the currently selected paper inside the TUI |   |
+| selection_icon | Char | Single character to put in front of the currently selected paper inside the TUI | -> |
 
 ### Colors
 

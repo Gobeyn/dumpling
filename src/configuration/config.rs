@@ -27,7 +27,7 @@ impl Default for GeneralFromFile {
             load_size: 30,
             pdf_viewer: String::from("zathura"),
             pdf_dir: String::from(pdf_dir.to_str().unwrap()),
-            selection_icon: String::from(" "),
+            selection_icon: String::from("->"),
         }
     }
 }
