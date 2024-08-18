@@ -191,6 +191,15 @@ impl Loader {
             Source::Bytes(bibtex_entry.into_bytes().into()),
             MimeType::Autodetect,
         ) {
+            Ok(_) => {}
+            Err(_) => {
+                return;
+            }
+        }
+        match std::process::Command::new("notify-send")
+            .arg("Bibtex copied")
+            .status()
+        {
             Ok(_) => {
                 return;
             }
