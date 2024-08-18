@@ -31,7 +31,7 @@ arguments can be attached to it:
 | -t | --title | "\[TITLE\]" | Set title of paper |
 | -y | --year | INT | Set year of publication |
 | / | --desc | "\[DESCRIPTION\]" | Short description of the papers contents |
-| -b | --bibtex | '''\[BIB\]''' | Bibtex formatted reference for the paper |
+| -b | --bibtex | "\[BIB\]" | Bibtex formatted reference for the paper |
 | / | --doc | "\[DOCNAME\]" | Name of the PDF document, the directory is set in the configuration file and should not be provided |
 | / | --filter-tag | "\[TAG\]" |Show only papers with certain tag. This only does something if the TUI is opened.|
 | -a | --author | "\[AUTHOR\]" | Add author for the paper, this option can be used multiple times. |

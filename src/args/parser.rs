@@ -122,7 +122,7 @@ pub fn parse_arguments() -> ProgArgs {
         "b",
         "bibtex",
         "Bibtex bibliography for paper",
-        "STRING (in triple single quotes)",
+        "STRING (in double quotes)",
     );
     opts.optopt(
         "",
