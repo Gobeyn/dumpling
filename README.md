@@ -1,10 +1,14 @@
 # Dumpling
 
-Dumpling is a light-weight, minimal research paper manager from the terminal. With the CLI tool, basic information on research papers 
-can be created, that can subsequently be explored by the TUI. Inside the TUI a minimal amount of essential actions can be performed. 
+![Dumpling TUI](./examples/example.jpg)
 
-By default, the application assumes papers are stored in `$HOME/.paper/`. The paper files created by the CLI tool are stored in the 
-`$HOME/.cache/dumpling` directory.
+Dumpling is a light-weight, minimal research paper manager from the terminal. With the CLI tool, basic information on research papers 
+can be created, and subsequently be explored by the TUI. Inside the TUI a minimal amount of essential actions can be performed. 
+
+By default, the application assumes papers are stored in `$HOME/.paper/`. The paper information files created by the CLI tool are stored in the 
+`$HOME/.cache/dumpling` directory which is always generated if it does not exists when the program is executed. 
+
+The program should work on UNIX based systems, e.g. Linux and MacOS, we are not sure if it does on Windows.
 
 ## Installation
 
@@ -12,10 +16,11 @@ For easy installation, a `Makefile` is provided. It is assumed that `GNU Make` a
 ```
 $ make
 ```
-To move the resulting compiled application to the /usr/bin/ directory so it can be accessed globally in you system run:
+To copy the resulting compiled application to the /usr/bin/ directory so it can be accessed globally in you system run:
 ```
 $ make install
 ```
+Copying the file to that directory is not required, you could also `export` the path to the binary in you `.bashrc`, `.zshrc`, etc.
 Lastly, to clean files from the compilation process:
 ```
 $ make clean
@@ -46,7 +51,8 @@ arguments can be attached to it:
 
 Here is an example usage:
 ```
-$ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditions and Duality: a Field Theoretic Approach" -y 2024 -j "Preprint arXiv" --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" -b "@article{dudal2024casimir,
+$ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditions and Duality: a Field Theoretic Approach" -y 2024 -j "Preprint arXiv" --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" 
+-b "@article{dudal2024casimir,
   title={The Casimir energy with perfect electromagnetic boundary conditions and duality: a field-theoretic approach},
   author={Dudal, David and Gobeyn, Aaron and Oosthuyse, Thomas and Stouten, Sebbe and Vercauteren, David},
   journal={arXiv preprint arXiv:2406.19743},
@@ -62,7 +68,7 @@ $ dumpling --desc "Computes the Casimir energy for PEMC boundary conditions betw
   author={Dudal, David and Gobeyn, Aaron and Oosthuyse, Thomas and Stouten, Sebbe and Vercauteren, David},
   journal={arXiv preprint arXiv:2406.19743},
   year={2024}
-}" --doc "Dudal_2024.pdf" --tag "Casimir" --tag "PEMC" --tag "EM tensor" --tag "Path integral"
+}" --doc "Dudal_2024.pdf" --tag "Casimir" --tag "PEMC" --tag "EM tensor" --tag "Path integral" --auto
 ```
 The title, year and authors of the paper are inferred from the given bibtex citation. If we then run:
 ```
@@ -151,8 +157,8 @@ Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-- Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing assumes `kitty` and `neovim` are installed and 
-    there is no configuration to change that. 
+- Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing of paper information files 
+    assumes `kitty` and `neovim` are installed and there is no configuration to change that. 
 - We should add logging, currently there are a lot of errors that can occur which do not crash the program, but also give us no information into 
     what went wrong.
 
