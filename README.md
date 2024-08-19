@@ -13,7 +13,8 @@ The program should work on UNIX based systems, e.g. Linux and MacOS, we are not 
 
 ## Installation
 
-For easy installation, a `Makefile` is provided. It is assumed that `GNU Make` and `Rust` are installed on you system. To build the application run:
+For easy installation, a `Makefile` is provided. It is assumed that [`GNU Make`](https://www.gnu.org/software/make/) and 
+the [Rust ecosystem (e.g. `rustup` and `cargo`)](https://www.rust-lang.org/tools/install) are installed on you system. To build the application run:
 ```
 $ make
 ```
