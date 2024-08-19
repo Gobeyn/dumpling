@@ -30,22 +30,10 @@ pub fn create_window(file_load: &mut Loader, config: &Config) {
                 run = false;
             }
             event::KeyEvents::Next => {
-                file_load.load_next();
-                if file_load.papers.is_empty() {
-                    file_pointer = 0;
-                } else if file_pointer >= file_load.papers.len() - 1 {
-                    file_pointer = file_load.papers.len() - 1;
-                } else {
-                    file_pointer += 1;
-                }
+                file_pointer = file_load.load_next(file_pointer);
             }
             event::KeyEvents::Previous => {
-                file_load.load_previous();
-                if file_pointer <= 1 {
-                    file_pointer = 0;
-                } else {
-                    file_pointer -= 1;
-                }
+                file_pointer = file_load.load_previous(file_pointer);
             }
             event::KeyEvents::Bibtex => {
                 file_load.bibtex_entry_to_clipboard(file_pointer);

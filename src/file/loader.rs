@@ -101,30 +101,43 @@ impl Loader {
         };
     }
     /// Load the next paper, if there is another valid paper to load.
-    pub fn load_next(&mut self) {
-        // Check if there is even anything to load, if not, exit.
+    pub fn load_next(&mut self, file_pointer: usize) -> usize {
+        let mut fp: usize = file_pointer;
+        // Check if there is even anything to load, if not, return a file pointer of zero.
         if self.valid_paths.is_empty() {
-            return;
+            return 0;
         }
         // Get the last loaded index
         let last_load: usize = match self.loaded_paths.back() {
             Some(v) => *v,
             None => {
-                return;
+                // There should be at least one element, the empty case was
+                // handled before. So we should never get here. In case we do,
+                // just return zero.
+                return 0;
             }
         };
         // Get the next load path if possible.
         let new_load_path = match self.valid_paths.get(last_load + 1) {
             Some(p) => p,
             None => {
-                return;
+                // If we were unable to load the next path, we are out of bounds meaning there is
+                // nothing further to load and the file pointer needs to be updated.
+                if file_pointer >= self.papers.len() - 1 {
+                    fp = self.papers.len() - 1;
+                } else {
+                    fp += 1;
+                }
+                return fp;
             }
         };
         // Load the paper
         let paper = match parse_paper_toml(new_load_path) {
             Some(p) => p,
             None => {
-                return;
+                // If the program is being used correctly, we should never get here.
+                eprintln!("Corrupt paper Toml file.");
+                std::process::exit(1);
             }
         };
         // Keep the load size by unloading the first elements and
@@ -133,47 +146,67 @@ impl Loader {
         self.papers.pop_front();
         self.loaded_paths.push_back(last_load + 1);
         self.papers.push_back(paper);
+        // If we've gotten here, a new file has been loaded and the file pointer should remain as
+        // is.
+        return fp;
     }
     /// Load the previous paper, if there is a previous paper to load.
-    pub fn load_previous(&mut self) {
-        // Check if there is even anything to load, if not, exit.
+    pub fn load_previous(&mut self, file_pointer: usize) -> usize {
+        let mut fp = file_pointer;
+        // Check if there is even anything to load, if not, return a file pointer of zero.
         if self.valid_paths.is_empty() {
-            return;
+            return 0;
         }
         // Get the first loaded index
         let first_load: usize = match self.loaded_paths.front() {
             Some(v) => *v,
             None => {
-                return;
+                // There should be at least one element, the empty case was
+                // handled before. So we should never get here. In case we do,
+                // just return zero.
+                return 0;
             }
         };
-        // Get the new load path if possible
+        // If first_load is zero, then subtracting can cause an overflow. Which needs to be handled
+        // before trying to get first_load - 1. This also means we are out of bounds for the
+        // valid_paths array and hence there is nothing more previous to load. The file pointer
+        // should be updated in this case.
         if first_load <= 0 {
-            return;
+            if file_pointer <= 0 {
+                fp = 0;
+            } else {
+                fp -= 1;
+            }
+            return fp;
         }
+
         let new_load_path = match self.valid_paths.get(first_load - 1) {
             Some(p) => p,
             None => {
-                return;
+                // We should never get here because the usize overflow check above already handles
+                // it.
+                eprintln!("Tried to access out of bounds part of array.");
+                std::process::exit(1);
             }
         };
         // Load the new paper
         let paper = match parse_paper_toml(new_load_path) {
             Some(p) => p,
             None => {
-                return;
+                // If the program is being used correctly, we should never get here.
+                eprintln!("Corrupt paper Toml file.");
+                std::process::exit(1);
             }
         };
-        // Check if there is even anything to load, if not, exit.
-        if self.valid_paths.is_empty() {
-            return;
-        }
         // Keep the load size by unloading the last entries and adding
         // the new elements to the front.
         self.loaded_paths.pop_back();
         self.papers.pop_back();
         self.loaded_paths.push_front(first_load - 1);
         self.papers.push_front(paper);
+        // If we've gotten here, a new file has been loaded and the file pointer should remain as
+        // is.
+        return fp;
     }
 
     /// Given an index in the `Loader.papers` vector, copy the

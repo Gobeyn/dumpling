@@ -107,7 +107,7 @@ Under the `[global]` section, the following can be configured:
 
 | Name | Value | Effect | Default |
 |------|-------|--------|---------|
-| load_size | 32-bit integer | Amount of files loaded when TUI is opened. | 30 |
+| load_size | 32-bit integer | Amount of files loaded when TUI is opened. This should depend on your monitor size. If more lines are loaded than the TUI can show, you will scroll passed them and the TUI will not scroll with you. | 30 |
 | pdf_viewer | String | PDF viewer to use when attempting to open the paper PDF. | zathura |
 | pdf_dir | String | Directory to search for paper PDF files. Aliases such a `$HOME` and `~` are not supported, so direct paths must be provided | $HOME/.paper/ |
 | selection_icon | Char | Single character to put in front of the currently selected paper inside the TUI | -> |
@@ -153,8 +153,6 @@ Note: all key binds are assumed the be single characters.
 
 - Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing assumes `kitty` and `neovim` are installed and 
     there is no configuration to change that. 
-- There is bug in the TUI where if a file is at the end of the load, it jumps to the newly load file instead of that file. This bug only appears if the 
-    `load_size` is smaller than the TUI can show, e.g. `load_size = 5` will show this bug but `load_size = 50` probably won't.
 - We should add logging, currently there are a lot of errors that can occur which do not crash the program, but also give us no information into 
     what went wrong.
 
