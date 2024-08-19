@@ -153,6 +153,10 @@ Note: all key binds are assumed the be single characters.
 
 - Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing assumes `kitty` and `neovim` are installed and 
     there is no configuration to change that. 
+- There is bug in the TUI where if a file is at the end of the load, it jumps to the newly load file instead of that file. This bug only appears if the 
+    `load_size` is smaller than the TUI can show, e.g. `load_size = 5` will show this bug but `load_size = 50` probably won't.
+- We should add logging, currently there are a lot of errors that can occur which do not crash the program, but also give us no information into 
+    what went wrong.
 
 ## Why Dumpling
 
