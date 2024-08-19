@@ -20,7 +20,7 @@ To copy the resulting compiled application to the /usr/bin/ directory so it can 
 ```
 $ make install
 ```
-Copying the file to that directory is not required, you could also `export` the path to the binary in you `.bashrc`, `.zshrc`, etc.
+Copying the file to that directory is not required, you could also `export` the path to the binary in your `.bashrc`, `.zshrc`, etc.
 Lastly, to clean files from the compilation process:
 ```
 $ make clean
