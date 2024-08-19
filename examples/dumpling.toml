@@ -10,7 +10,7 @@
 # Documentation: https://github.com/Gobeyn/dumpling
 
 [general]
-load_size = 30
+load_size = 22
 pdf_viewer = "zathura"
 selection_icon = ""
 
@@ -26,6 +26,8 @@ content_block_border = [62,143,176] # Pine
 title_content = [246,193,119] # Gold
 author_content = [196, 167, 231] # Iris
 description_content = [224, 222, 224] # Text
+tag_content = [196,167,231] # Iris
+
  
 [keybinds]
 quit = "q"
