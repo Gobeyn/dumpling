@@ -3,6 +3,7 @@ pub mod configuration;
 pub mod file;
 pub mod key;
 pub mod listing;
+pub mod logger;
 pub mod ui;
 
 use args::parser::{parse_arguments, ProgArgs};
@@ -11,18 +12,41 @@ use file::loader::Loader;
 use file::parser::write_new_paper;
 use listing::pdfs::pdf_diagnostic;
 use listing::tags::list_tags;
+use logger::logger::init_logging;
 use ui::window::create_window;
 
 fn main() {
+    // Initialise logger
+    init_logging();
+
     // Create cache directory if it doesn't exist.
-    let mut folderdir = dirs::cache_dir().expect("Error obtaining $HOME/.cache/");
+    let mut folderdir = match dirs::cache_dir() {
+        Some(p) => p,
+        None => {
+            log::error!("Could not obtain $HOME/.cache/ as `PathBuf`");
+            std::process::exit(1);
+        }
+    };
+
     folderdir.push("dumpling");
     if !folderdir.exists() {
-        std::fs::create_dir(folderdir.clone()).expect("Error creating $HOME/.cache/dumpling/");
+        match std::fs::create_dir(folderdir.clone()) {
+            Ok(_) => {}
+            Err(err) => {
+                log::error!("Could not create $HOME/.cache/: {err}");
+                std::process::exit(1);
+            }
+        }
     }
 
     // Get configuration file
-    let mut config_path = dirs::config_dir().expect("Error obtaining $HOME/.config/");
+    let mut config_path = match dirs::config_dir() {
+        Some(p) => p,
+        None => {
+            log::error!("Could not obtain $HOME/.config/ as `PathBuf`");
+            std::process::exit(1);
+        }
+    };
     config_path.push("dumpling");
     config_path.push("dumpling.toml");
     let config = Config::from_config_file(&config_path);

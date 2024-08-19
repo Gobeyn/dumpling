@@ -9,21 +9,44 @@ use crate::key::event;
 /// called here.
 pub fn create_window(file_load: &mut Loader, config: &Config) {
     // Enable raw mode, disabling user input like typing
-    crossterm::terminal::enable_raw_mode().expect("Error enabling raw mode.");
+    match crossterm::terminal::enable_raw_mode() {
+        Ok(_) => {}
+        Err(err) => {
+            log::error!("Error enabling raw mode: {err}");
+            std::process::exit(1);
+        }
+    }
+
     // Create alternate screen on top of current terminal session
-    crossterm::execute!(std::io::stdout(), crossterm::terminal::EnterAlternateScreen)
-        .expect("Error changing to alternate screen.");
+    match crossterm::execute!(std::io::stdout(), crossterm::terminal::EnterAlternateScreen) {
+        Ok(_) => {}
+        Err(err) => {
+            log::error!("Error opening alternate screen on top of current terminal: {err}");
+            std::process::exit(1);
+        }
+    }
     // Define ratatui terminal interface with crossterm
     let mut terminal =
-        ratatui::Terminal::new(ratatui::backend::CrosstermBackend::new(std::io::stdout()))
-            .expect("Error creating Ratatui terminal interface with crossterm");
+        match ratatui::Terminal::new(ratatui::backend::CrosstermBackend::new(std::io::stdout())) {
+            Ok(t) => t,
+            Err(err) => {
+                log::error!("Error creating `ratatui` terminal interfaced with `crossterm`: {err}");
+                std::process::exit(1);
+            }
+        };
 
     // Define UI drawing loop
     let mut run = true;
     let mut file_pointer: usize = 0;
     while run {
         let ui = ui_wrapper::ui_pre_args(file_load, config, file_pointer);
-        terminal.draw(ui).expect("Error when rendering the TUI");
+        match terminal.draw(ui) {
+            Ok(_) => {}
+            Err(err) => {
+                log::error!("Error displaying TUI: {err}");
+                std::process::exit(1);
+            }
+        }
         let key_event: event::KeyEvents = event::get_key_event(config);
         match key_event {
             event::KeyEvents::Quit => {
@@ -56,8 +79,19 @@ pub fn create_window(file_load: &mut Loader, config: &Config) {
     }
 
     // Disable raw mode so we return to normal terminal function
-    crossterm::terminal::disable_raw_mode().expect("Error disabling raw mode");
+    match crossterm::terminal::disable_raw_mode() {
+        Ok(_) => {}
+        Err(err) => {
+            log::error!("Error disabling raw mode: {err}");
+            std::process::exit(1);
+        }
+    }
     // Leave alternate screen and return to original
-    crossterm::execute!(std::io::stdout(), crossterm::terminal::LeaveAlternateScreen)
-        .expect("Error leaving alternate screen");
+    match crossterm::execute!(std::io::stdout(), crossterm::terminal::LeaveAlternateScreen) {
+        Ok(_) => {}
+        Err(err) => {
+            log::error!("Error leaving alternate terminal screen and returning to original: {err}");
+            std::process::exit(1);
+        }
+    }
 }

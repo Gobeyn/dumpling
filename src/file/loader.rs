@@ -11,18 +11,37 @@ pub fn get_all_valid_filepaths(
     // Initialise vector
     let mut all_file_paths: Vec<std::path::PathBuf> = Vec::new();
     // Loop trough all files in the directory.
-    let paths = std::fs::read_dir(folderdir).expect("Error obtaining file paths.");
+    let paths = match std::fs::read_dir(folderdir) {
+        Ok(p) => p,
+        Err(err) => {
+            log::error!("Error obtaining paths to files in {folderdir:?}: {err}");
+            std::process::exit(1);
+        }
+    };
     // Define the expected form of the files.
-    let re = regex::Regex::new(r"^*\.toml$").expect("Error building Regex.");
+    let re = match regex::Regex::new(r"^*\.toml$") {
+        Ok(r) => r,
+        Err(err) => {
+            log::error!("Error creating *.toml regex: {err}");
+            std::process::exit(1);
+        }
+    };
     // Loop through all the paths, and add them to the vector
     for path in paths {
         let (file_name_os_string, file_path) = match path {
             Ok(p) => (p.file_name(), p.path()),
-            Err(_) => {
+            Err(err) => {
+                log::warn!("Error extracting `DirEntry` from a path, skipping this path: {err}");
                 continue;
             }
         };
-        let file_name = file_name_os_string.to_str().unwrap();
+        let file_name = match file_name_os_string.to_str() {
+            Some(s) => s,
+            None => {
+                log::error!("Error converting `OsString` to `&str`");
+                std::process::exit(1);
+            }
+        };
         if re.is_match(&file_name) {
             match tag_filter {
                 Some(tag) => {
@@ -30,6 +49,7 @@ pub fn get_all_valid_filepaths(
                     let paper = match parse_paper_toml(&file_path) {
                         Some(p) => p,
                         None => {
+                            log::warn!("Contents of {file_path:?} could not be deserialised into `Paper` struct, continuing to next paper to check tag of");
                             continue;
                         }
                     };
@@ -81,12 +101,16 @@ impl Loader {
             let file_path = match valid_paths.get(i as usize) {
                 Some(p) => p,
                 None => {
+                    // If we get here, the load is probably larger than the amount of valid paths.
+                    // We could break out of the loop here, but just to be safe we'll continue on
+                    // to the next iteration.
                     continue;
                 }
             };
             let paper = match parse_paper_toml(file_path) {
                 Some(p) => p,
                 None => {
+                    log::warn!("Contents of {file_path:?} could not be deserialised into `Paper` struct, continuing to load next paper");
                     continue;
                 }
             };
@@ -114,6 +138,7 @@ impl Loader {
                 // There should be at least one element, the empty case was
                 // handled before. So we should never get here. In case we do,
                 // just return zero.
+                log::warn!("Attempting to load non-existent back of `VecDeque`.");
                 return 0;
             }
         };
@@ -136,7 +161,7 @@ impl Loader {
             Some(p) => p,
             None => {
                 // If the program is being used correctly, we should never get here.
-                eprintln!("Corrupt paper Toml file.");
+                log::error!("Error loading the next `Paper`.");
                 std::process::exit(1);
             }
         };
@@ -164,6 +189,7 @@ impl Loader {
                 // There should be at least one element, the empty case was
                 // handled before. So we should never get here. In case we do,
                 // just return zero.
+                log::warn!("Attempting to load non-existent front of `VecDeque`.");
                 return 0;
             }
         };
@@ -185,7 +211,9 @@ impl Loader {
             None => {
                 // We should never get here because the usize overflow check above already handles
                 // it.
-                eprintln!("Tried to access out of bounds part of array.");
+                log::error!(
+                    "Attempting to access outside the bounds of the `Loader.valid_paths` array."
+                );
                 std::process::exit(1);
             }
         };
@@ -194,7 +222,7 @@ impl Loader {
             Some(p) => p,
             None => {
                 // If the program is being used correctly, we should never get here.
-                eprintln!("Corrupt paper Toml file.");
+                log::error!("Error loading the previous `Paper`.");
                 std::process::exit(1);
             }
         };
@@ -218,20 +246,26 @@ impl Loader {
         let bibtex_entry = match self.papers.get(selected_idx) {
             Some(p) => p.bibtex.clone(),
             None => {
+                log::warn!(
+                    "Currently selected paper does not exist in the `Loader.papers` `VecDeque`. Stop copying bibtex contents to clipboard."
+                );
                 return;
             }
         };
         // Get clipboard context
         let mut ctx = match ClipboardContext::new() {
             Ok(c) => c,
-            Err(_) => {
+            Err(err) => {
+                log::warn!("Error obtaining clipboard context: {err}");
                 return;
             }
         };
         // Set contents
         match ctx.set_contents(bibtex_entry) {
             Ok(_) => {}
-            Err(_) => {}
+            Err(err) => {
+                log::warn!("Error setting clipboard contents: {err}");
+            }
         }
         // Send notification
         match std::process::Command::new("notify-send")
@@ -239,7 +273,9 @@ impl Loader {
             .status()
         {
             Ok(_) => {}
-            Err(_) => {}
+            Err(err) => {
+                log::warn!("Error sending notification with `notify-send`: {err}");
+            }
         }
     }
     // TODO: We could add an argument, that is set by the user in the configuration file
@@ -256,6 +292,7 @@ impl Loader {
         let fp_pointer = match self.loaded_paths.get(selected_idx) {
             Some(i) => *i,
             None => {
+                log::warn!("Currently selected paper does not exists in the `Loader.loaded_paths` `VecDeque`. Stop opening editor.");
                 return;
             }
         };
@@ -263,6 +300,7 @@ impl Loader {
         let file_path = match self.valid_paths.get(fp_pointer) {
             Some(p) => p.clone(),
             None => {
+                log::warn!("File pointer does not point to an existing element of the `Loader.valid_paths` vector. Stop opening editor.");
                 return;
             }
         };
@@ -276,7 +314,8 @@ impl Loader {
             Ok(_) => {
                 return;
             }
-            Err(_) => {
+            Err(err) => {
+                log::warn!("Error executing command to open editor: {err}");
                 return;
             }
         }
@@ -295,6 +334,7 @@ impl Loader {
         let file_name = match self.papers.get(selected_idx) {
             Some(p) => p.docname.clone(),
             None => {
+                log::warn!("Currently selected paper does not exist in the `Loader.papers` `VecDeque`. Stop opening PDF viewer.");
                 return;
             }
         };
@@ -311,7 +351,8 @@ impl Loader {
                 Ok(_) => {
                     return;
                 }
-                Err(_) => {
+                Err(err) => {
+                    log::warn!("Error executing command to open PDF viewer: {err}");
                     return;
                 }
             }
@@ -330,6 +371,7 @@ impl Loader {
         let fp_pointer = match self.loaded_paths.get(selected_idx) {
             Some(i) => *i,
             None => {
+                log::warn!("Currently selected paper does not exist in the `Loader.loaded_paths` `VecDeque`. Stop removing file.");
                 return;
             }
         };
@@ -337,13 +379,20 @@ impl Loader {
         let file_path = match self.valid_paths.get(fp_pointer) {
             Some(p) => p.clone(),
             None => {
+                log::warn!("File pointer does not point to an existing element of the `Loader.valid_paths` vector. Stop removing file.");
                 return;
             }
         };
         // Check if the file exists
         if file_path.exists() {
             // Delete the file
-            std::fs::remove_file(file_path).expect("Error attempting to remove file");
+            match std::fs::remove_file(file_path) {
+                Ok(_) => {}
+                Err(err) => {
+                    log::warn!("Error attempting to remove file. Stop removing file: {err}");
+                    return;
+                }
+            }
             // All the pointers in `loaded_paths` larger than the removed `fp_pointer` need to be
             // shifted down by one
             self.loaded_paths = self

@@ -6,7 +6,8 @@ Dumpling is a light-weight, minimal research paper manager from the terminal. Wi
 can be created, and subsequently be explored by the TUI. Inside the TUI a minimal amount of essential actions can be performed. 
 
 By default, the application assumes papers are stored in `$HOME/.paper/`. The paper information files created by the CLI tool are stored in the 
-`$HOME/.cache/dumpling` directory which is always generated if it does not exists when the program is executed. 
+`$HOME/.cache/dumpling` directory which is always generated if it does not exists when the program is executed. If there is any weird behaviour, 
+check out the `dumpling.log` file which is also stored in the `$HOME/.cache/dumpling/` directory.
 
 The program should work on UNIX based systems, e.g. Linux and MacOS, we are not sure if it does on Windows.
 
@@ -159,8 +160,6 @@ Note: all key binds are assumed the be single characters.
 
 - Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing of paper information files 
     assumes `kitty` and `neovim` are installed and there is no configuration to change that. 
-- We should add logging, currently there are a lot of errors that can occur which do not crash the program, but also give us no information into 
-    what went wrong.
 
 ## Why Dumpling
 

@@ -183,7 +183,13 @@ pub fn parse_arguments() -> ProgArgs {
         // This requires bibtex to be present
         if matches.opt_present("b") {
             // Parse the bibtex string
-            let bibtex_str = matches.opt_str("b").expect("Error with --bibtex");
+            let bibtex_str = match matches.opt_str("b") {
+                Some(s) => s,
+                None => {
+                    log::error!("Error obtaining argument from --bibtex option.");
+                    std::process::exit(1);
+                }
+            };
             let (title, year, journal, authors) = extract_bibtex_fields(&bibtex_str);
             match title {
                 Some(t) => {
@@ -214,37 +220,80 @@ pub fn parse_arguments() -> ProgArgs {
 
     // Check if title is present
     if matches.opt_present("t") {
-        prog_args.title = matches.opt_str("t").expect("Error with --title");
+        prog_args.title = match matches.opt_str("t") {
+            Some(s) => s,
+            None => {
+                log::error!("Error obtaining argument from --title option.");
+                std::process::exit(1);
+            }
+        };
     }
     // Check if year is present
     if matches.opt_present("y") {
-        let res = matches.opt_str("y").expect("Error with --year");
-        prog_args.year = res
-            .parse::<i32>()
-            .expect("Error parsing --year into integer");
+        let res = match matches.opt_str("y") {
+            Some(s) => s,
+            None => {
+                log::error!("Error obtaining argument from --year option.");
+                std::process::exit(1);
+            }
+        };
+        prog_args.year = match res.parse::<i32>() {
+            Ok(n) => n,
+            Err(err) => {
+                log::error!("Error parsing argument of --year into 32-bit integer: {err}");
+                std::process::exit(1);
+            }
+        };
     }
     // Check if journal is present
     if matches.opt_present("j") {
-        prog_args.journal = matches.opt_str("j").expect("Error with --journal");
+        prog_args.journal = match matches.opt_str("j") {
+            Some(s) => s,
+            None => {
+                log::error!("Error obtaining argument from --journal option.");
+                std::process::exit(1);
+            }
+        };
     }
-
     // Check if description is present
     if matches.opt_present("desc") {
-        prog_args.description = matches.opt_str("desc").expect("Error with --description");
+        prog_args.description = match matches.opt_str("desc") {
+            Some(s) => s,
+            None => {
+                log::error!("Error obtaining argument from --desc option.");
+                std::process::exit(1);
+            }
+        };
     }
     // Check if bibtex is present
     if matches.opt_present("b") {
-        prog_args.bibtex = matches.opt_str("b").expect("Error with --bibtex");
+        prog_args.bibtex = match matches.opt_str("b") {
+            Some(s) => s,
+            None => {
+                log::error!("Error obtaining argument from --bibtex option.");
+                std::process::exit(1);
+            }
+        }
     }
     // Check if document-name is present
     if matches.opt_present("doc") {
-        prog_args.docname = matches.opt_str("doc").expect("Error with --doc-name");
+        prog_args.docname = match matches.opt_str("doc") {
+            Some(s) => s,
+            None => {
+                log::error!("Error obtaining argument from --doc option.");
+                std::process::exit(1);
+            }
+        };
     }
     // Check if filter-tag is present
     if matches.opt_present("filter-tag") {
-        prog_args.filter_by_tag = matches
-            .opt_str("filter-tag")
-            .expect("Error with --filter-tag");
+        prog_args.filter_by_tag = match matches.opt_str("filter-tag") {
+            Some(s) => s,
+            None => {
+                log::error!("Error obtaining argument from --filter-tag.");
+                std::process::exit(1);
+            }
+        };
     }
     // Multi opts
     // Check if authors were provided
@@ -302,15 +351,34 @@ pub fn extract_bibtex_fields(
     Option<Vec<String>>,
 ) {
     // Define the regular expression that will extract each fields
-    let title_re =
-        regex::Regex::new(r"(?i)title\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
-    let year_re =
-        regex::Regex::new(r"(?i)year\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
-    let journal_re =
-        regex::Regex::new(r"(?i)journal\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
-    let author_re =
-        regex::Regex::new(r"(?i)author\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
-
+    let title_re = match regex::Regex::new(r"(?i)title\s*=\s*\{([^}]+)\}") {
+        Ok(r) => r,
+        Err(err) => {
+            log::error!("Could not create title regex: {err}");
+            std::process::exit(1);
+        }
+    };
+    let year_re = match regex::Regex::new(r"(?i)year\s*=\s*\{([^}]+)\}") {
+        Ok(r) => r,
+        Err(err) => {
+            log::error!("Could not create year regex: {err}");
+            std::process::exit(1);
+        }
+    };
+    let journal_re = match regex::Regex::new(r"(?i)journal\s*=\s*\{([^}]+)\}") {
+        Ok(r) => r,
+        Err(err) => {
+            log::error!("Could not create journal regex: {err}");
+            std::process::exit(1);
+        }
+    };
+    let author_re = match regex::Regex::new(r"(?i)author\s*=\s*\{([^}]+)\}") {
+        Ok(r) => r,
+        Err(err) => {
+            log::error!("Could not create author regex: {err}");
+            std::process::exit(1);
+        }
+    };
     // Get the matched title, None if there was no match.
     let title: Option<String> = {
         if title_re.is_match(bibtex) {

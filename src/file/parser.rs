@@ -50,7 +50,8 @@ pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
     // Attempt to open the file
     let mut file = match std::fs::File::open(filepath) {
         Ok(v) => v,
-        Err(_) => {
+        Err(err) => {
+            log::warn!("Error opening {filepath:?}, `None` is returned: {err}");
             return None;
         }
     };
@@ -59,7 +60,8 @@ pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
     let mut contents = String::new();
     match file.read_to_string(&mut contents) {
         Ok(_) => {}
-        Err(_) => {
+        Err(err) => {
+            log::warn!("Error reading contents of {filepath:?}, `None` is returned: {err}");
             return None;
         }
     }
@@ -67,7 +69,8 @@ pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
     // Parse the file contents
     let parsed_toml: toml::Value = match toml::from_str(&contents) {
         Ok(v) => v,
-        Err(_) => {
+        Err(err) => {
+            log::warn!("Error parsing contents of {filepath:?} into `toml::Value`, `None` is returned: {err}");
             return None;
         }
     };
@@ -76,7 +79,8 @@ pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
     // if needed.
     let paper: Paper = match parsed_toml.try_into() {
         Ok(v) => v,
-        Err(_) => {
+        Err(err) => {
+            log::warn!("Error deserializing contents of {filepath:?} into `Paper` struct, `None` is returned: {err}");
             return None;
         }
     };
@@ -88,7 +92,13 @@ pub fn parse_paper_toml(filepath: &std::path::PathBuf) -> Option<Paper> {
 /// store the serialized `Paper` instance as a *.toml file in the specified directory.
 pub fn write_new_paper(paper: &Paper, folderdir: &std::path::PathBuf) {
     // Convert the `Paper` struct into a toml formatted string.
-    let toml_str = toml::to_string(paper).expect("Error parsing Paper struct to Toml string.");
+    let toml_str = match toml::to_string(paper) {
+        Ok(s) => s,
+        Err(err) => {
+            log::error!("Error serializing `Paper` struct into Toml formatted string: {err}");
+            std::process::exit(1);
+        }
+    };
     // Create unique file name to store the file under by hashing the byte content.
     // Create new hasher instance
     let mut hasher = Sha256::new();
@@ -102,5 +112,11 @@ pub fn write_new_paper(paper: &Paper, folderdir: &std::path::PathBuf) {
     let mut file_path = folderdir.clone();
     file_path.push(file_name);
     // Save the file
-    std::fs::write(file_path, toml_str).expect("Error writing Toml file.");
+    match std::fs::write(file_path, toml_str) {
+        Ok(_) => {}
+        Err(err) => {
+            log::error!("Error writing contents of `Paper` struct: {err}");
+            std::process::exit(1);
+        }
+    }
 }

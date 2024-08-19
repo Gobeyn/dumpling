@@ -13,9 +13,21 @@ fn load_all_papers(folderdir: &std::path::PathBuf) -> Vec<Paper> {
     // Initialise vector
     let mut papers: Vec<Paper> = Vec::new();
     // Loop trough all files in the directory.
-    let paths = std::fs::read_dir(folderdir).expect("Error obtaining file paths.");
+    let paths = match std::fs::read_dir(folderdir) {
+        Ok(p) => p,
+        Err(err) => {
+            log::error!("Error obtaining paths to files in {folderdir:?}: {err}");
+            std::process::exit(1);
+        }
+    };
     // Regex for the expected INT.toml format.
-    let re = regex::Regex::new(r"^*\.toml$").expect("Error building Regex.");
+    let re = match regex::Regex::new(r"^*\.toml$") {
+        Ok(r) => r,
+        Err(err) => {
+            log::error!("Error creating *.toml regex: {err}");
+            std::process::exit(1);
+        }
+    };
     // Loop through the paths
     for path in paths {
         let (file_name_os_string, mut file_path) = match path {
@@ -24,17 +36,25 @@ fn load_all_papers(folderdir: &std::path::PathBuf) -> Vec<Paper> {
                 let fp = p.path();
                 (fnos, fp)
             }
-            Err(_) => {
+            Err(err) => {
+                log::warn!(
+                    "Error extracting `DirEntry` from a path, continuing to next path: {err}"
+                );
                 continue;
             }
         };
-        let file_name = file_name_os_string
-            .to_str()
-            .expect("Error obtaining  &str from OsString");
+        let file_name = match file_name_os_string.to_str() {
+            Some(s) => s,
+            None => {
+                log::error!("Error converting `OsString` into `&str`.");
+                std::process::exit(1);
+            }
+        };
         if re.is_match(&file_name) {
             let paper = match parse_paper_toml(&mut file_path) {
                 Some(p) => p,
                 None => {
+                    log::warn!("Error deserialising {file_path:?} into `Paper` struct, continuing to next paper.");
                     continue;
                 }
             };
@@ -70,11 +90,18 @@ fn get_stored_pdf_paths(pdf_dir: &String) -> Vec<std::path::PathBuf> {
     let mut pdf_paths: Vec<std::path::PathBuf> = Vec::new();
     let folder_path = std::path::PathBuf::from(pdf_dir);
 
-    let paths = std::fs::read_dir(&folder_path).expect("Error reading PDF file directory");
+    let paths = match std::fs::read_dir(&folder_path) {
+        Ok(p) => p,
+        Err(err) => {
+            log::error!("Error obtaining PDF file paths: {err}");
+            std::process::exit(1);
+        }
+    };
     for path in paths {
         let file_path = match path {
             Ok(p) => p.path(),
-            Err(_) => {
+            Err(err) => {
+                log::warn!("Error extracting `DirEntry` from path, continuing to next path: {err}");
                 continue;
             }
         };
@@ -82,6 +109,9 @@ fn get_stored_pdf_paths(pdf_dir: &String) -> Vec<std::path::PathBuf> {
             let extension = match file_path.extension() {
                 Some(e) => e,
                 None => {
+                    log::warn!(
+                        "Could not extract extension from {file_path:?}, continuing to next path."
+                    );
                     continue;
                 }
             };

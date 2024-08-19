@@ -21,12 +21,25 @@ pub struct GeneralFromFile {
 
 impl Default for GeneralFromFile {
     fn default() -> Self {
-        let mut pdf_dir = dirs::home_dir().expect("Error obtaining $HOME directory");
+        let mut pdf_dir = match dirs::home_dir() {
+            Some(p) => p,
+            None => {
+                log::error!("Error obtaining $HOME as `PathBuf`");
+                std::process::exit(1);
+            }
+        };
         pdf_dir.push(".paper");
+        let pdf_dir = match pdf_dir.to_str() {
+            Some(s) => s,
+            None => {
+                log::error!("Error converting $HOME `PathBuf` into `&str`.");
+                std::process::exit(1);
+            }
+        };
         GeneralFromFile {
             load_size: 30,
             pdf_viewer: String::from("zathura"),
-            pdf_dir: String::from(pdf_dir.to_str().unwrap()),
+            pdf_dir: String::from(pdf_dir),
             selection_icon: String::from("->"),
         }
     }
@@ -222,7 +235,8 @@ pub fn parse_config_file(filepath: &std::path::PathBuf) -> ConfigFromFile {
     // Open the file
     let mut file = match std::fs::File::open(filepath) {
         Ok(v) => v,
-        Err(_) => {
+        Err(err) => {
+            log::warn!("Unable to open {filepath:?}, default configuration is used: {err}");
             return ConfigFromFile::default();
         }
     };
@@ -230,22 +244,26 @@ pub fn parse_config_file(filepath: &std::path::PathBuf) -> ConfigFromFile {
     let mut contents = String::new();
     match file.read_to_string(&mut contents) {
         Ok(_) => {}
-        Err(_) => {
+        Err(err) => {
+            log::warn!(
+                "Unable to read contents of {filepath:?}, default configuration is used: {err}"
+            );
             return ConfigFromFile::default();
         }
     };
     // Parse the file contents
     let parsed_toml: toml::Value = match toml::from_str(&contents) {
         Ok(v) => v,
-        Err(_) => {
+        Err(err) => {
+            log::warn!("Unable to parse contents of {filepath:?} into `toml::Value`, default configuration is used: {err}");
             return ConfigFromFile::default();
         }
     };
     // Convert config Toml to struct
     let config_struct: ConfigFromFile = match parsed_toml.try_into() {
         Ok(v) => v,
-        Err(e) => {
-            eprintln!("Error converting to struct: {}", e);
+        Err(err) => {
+            log::warn!("Unable to deserialize contents of {filepath:?} into `ConfigFromFile` struct, default configuration is used: {err}");
             return ConfigFromFile::default();
         }
     };

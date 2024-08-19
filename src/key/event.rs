@@ -21,7 +21,8 @@ pub fn get_key_event(config: &Config) -> KeyEvents {
         Ok(_) => {
             let event_read = match crossterm::event::read() {
                 Ok(event) => event,
-                Err(_) => {
+                Err(err) => {
+                    log::warn!("Error reading events, `NoEvent` is returned: {err}");
                     return KeyEvents::NoEvent;
                 }
             };
@@ -57,7 +58,8 @@ pub fn get_key_event(config: &Config) -> KeyEvents {
                 return KeyEvents::NoEvent;
             }
         }
-        Err(_) => {
+        Err(err) => {
+            log::warn!("Error polling event, `NoEvent` is returned: {err}");
             return KeyEvents::NoEvent;
         }
     };
