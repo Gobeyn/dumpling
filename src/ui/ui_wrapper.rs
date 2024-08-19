@@ -118,7 +118,7 @@ pub fn ui_pre_args<'a>(
             .wrap(Wrap { trim: true });
 
         let author_block = Block::new()
-            .title(" Authors ")
+            .title(" Authors, year & journal ")
             .title_alignment(Alignment::Center)
             .title_style(
                 Style::default()

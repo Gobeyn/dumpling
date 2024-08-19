@@ -9,19 +9,21 @@ pub fn render(file_load: &Loader, config: &Config, selected_idx: usize) -> Vec<L
     let mut render_text: Vec<Line> = Vec::new();
 
     // Get author and year from selected paper
-    let (author, year) = match file_load.papers.get(selected_idx) {
+    let (author, year, journal) = match file_load.papers.get(selected_idx) {
         Some(p) => {
             let mut auth_txt = String::new();
             for auth in &p.authors {
                 auth_txt.push_str(&auth.name);
                 auth_txt.push_str(" | ");
             }
-            let year_txt = format!("Published: {}", p.year);
-            (auth_txt, year_txt)
+            let year_txt = format!("Published year: {}", p.year);
+            let journal_txt = format!("Published journal: {}", p.journal);
+            (auth_txt, year_txt, journal_txt)
         }
         None => (
-            "Error retrieving info".to_string(),
-            "Error retrieving info".to_string(),
+            "Error retrieving authors".to_string(),
+            "Error retrieving year".to_string(),
+            "Error retrieving journal".to_string(),
         ),
     };
 
@@ -31,6 +33,10 @@ pub fn render(file_load: &Loader, config: &Config, selected_idx: usize) -> Vec<L
     )));
     render_text.push(Line::from(Span::styled(
         year,
+        Style::default().fg(config.colors.author_content),
+    )));
+    render_text.push(Line::from(Span::styled(
+        journal,
         Style::default().fg(config.colors.author_content),
     )));
 

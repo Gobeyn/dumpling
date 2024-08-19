@@ -21,6 +21,7 @@ pub struct ProgFlags {
 pub struct ProgArgs {
     pub title: String,
     pub year: i32,
+    pub journal: String,
     pub description: String,
     pub bibtex: String,
     pub docname: String,
@@ -46,6 +47,7 @@ impl Default for ProgArgs {
         ProgArgs {
             title: String::new(),
             year: 0,
+            journal: String::new(),
             description: String::new(),
             bibtex: String::new(),
             docname: String::new(),
@@ -92,6 +94,7 @@ impl ProgArgs {
         let paper = file::parser::Paper {
             title: self.title.clone(),
             year: self.year,
+            journal: self.journal.clone(),
             description: self.description.clone(),
             bibtex: self.bibtex.clone(),
             docname: self.docname.clone(),
@@ -114,6 +117,12 @@ pub fn parse_arguments() -> ProgArgs {
     // Define the program options
     opts.optopt("t", "title", "Title of paper", "STRING (in double quotes)");
     opts.optopt("y", "year", "Year of paper publication", "INTEGER (0-?)");
+    opts.optopt(
+        "j",
+        "journal",
+        "Journal the paper was published in",
+        "STRING (in double quotes)",
+    );
     opts.optopt(
         "",
         "desc",
@@ -175,25 +184,28 @@ pub fn parse_arguments() -> ProgArgs {
         if matches.opt_present("b") {
             // Parse the bibtex string
             let bibtex_str = matches.opt_str("b").expect("Error with --bibtex");
-            let (title, year, authors) = extract_bibtex_fields(&bibtex_str);
+            let (title, year, journal, authors) = extract_bibtex_fields(&bibtex_str);
             match title {
                 Some(t) => {
-                    prog_args.title = t.clone();
-                    println!("Title: {}", t);
+                    prog_args.title = t;
                 }
                 None => {}
             }
             match year {
                 Some(y) => {
                     prog_args.year = y;
-                    println!("Year: {}", y);
+                }
+                None => {}
+            }
+            match journal {
+                Some(j) => {
+                    prog_args.journal = j;
                 }
                 None => {}
             }
             match authors {
                 Some(a) => {
-                    prog_args.authors = a.clone();
-                    println!("Authors: {:?}", a);
+                    prog_args.authors = a;
                 }
                 None => {}
             }
@@ -211,6 +223,11 @@ pub fn parse_arguments() -> ProgArgs {
             .parse::<i32>()
             .expect("Error parsing --year into integer");
     }
+    // Check if journal is present
+    if matches.opt_present("j") {
+        prog_args.journal = matches.opt_str("j").expect("Error with --journal");
+    }
+
     // Check if description is present
     if matches.opt_present("desc") {
         prog_args.description = matches.opt_str("desc").expect("Error with --description");
@@ -278,12 +295,19 @@ pub fn print_version() {
 /// extractions fail, None is return for that field.
 pub fn extract_bibtex_fields(
     bibtex: &String,
-) -> (Option<String>, Option<i32>, Option<Vec<String>>) {
+) -> (
+    Option<String>,
+    Option<i32>,
+    Option<String>,
+    Option<Vec<String>>,
+) {
     // Define the regular expression that will extract each fields
     let title_re =
         regex::Regex::new(r"(?i)title\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
     let year_re =
         regex::Regex::new(r"(?i)year\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
+    let journal_re =
+        regex::Regex::new(r"(?i)journal\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
     let author_re =
         regex::Regex::new(r"(?i)author\s*=\s*\{([^}]+)\}").expect("Error generating regex.");
 
@@ -309,6 +333,21 @@ pub fn extract_bibtex_fields(
             match caps {
                 Some(c) => match c.get(1) {
                     Some(s) => Some(s.as_str().parse::<i32>().unwrap()),
+                    None => None,
+                },
+                None => None,
+            }
+        } else {
+            None
+        }
+    };
+    // Get matched journal, None if there was no match.
+    let journal: Option<String> = {
+        if journal_re.is_match(bibtex) {
+            let caps = journal_re.captures(bibtex);
+            match caps {
+                Some(c) => match c.get(1) {
+                    Some(s) => Some(s.as_str().to_string()),
                     None => None,
                 },
                 None => None,
@@ -355,5 +394,5 @@ pub fn extract_bibtex_fields(
     };
 
     // Return the parsed fields
-    return (title, year, authors);
+    return (title, year, journal, authors);
 }

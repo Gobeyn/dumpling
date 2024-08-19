@@ -175,6 +175,8 @@ impl Loader {
         self.loaded_paths.push_front(first_load - 1);
         self.papers.push_front(paper);
     }
+    // TODO: Find a system dependent way of doing this. Currently this will only function
+    // on Wayland with wl-clipboard installed.
     /// Given an index in the `Loader.papers` vector, copy the
     /// contents of the `Paper.bibtex` field to the system clipboard.
     /// The method assumes `wl-clipboard` is installed and uses the
@@ -208,6 +210,12 @@ impl Loader {
             }
         }
     }
+    // TODO: We could add an argument, that is set by the user in the configuration file
+    // which contains the line `kitty --detach nvim` and use that information to create the
+    // command. Or we could add some fields in the configuration file that specify which terminal
+    // and code editor is being used, though is suspect editors like vscode to not need the
+    // additional terminal part that caused issues with Neovim opening in the current session
+    // as it is a separate GUI all together.
     /// Open the paper pointed at by `selected_idx` in Neovim.
     /// Note that this function assumes `kitty` and `nvim` are
     /// installed.
@@ -304,7 +312,15 @@ impl Loader {
         if file_path.exists() {
             // Delete the file
             std::fs::remove_file(file_path).expect("Error attempting to remove file");
+            // All the pointers in `loaded_paths` larger than the removed `fp_pointer` need to be
+            // shifted down by one
+            self.loaded_paths = self
+                .loaded_paths
+                .iter()
+                .map(|&x| if x > fp_pointer { x - 1 } else { x })
+                .collect();
             // Remove it from the loader
+            self.valid_paths.remove(fp_pointer);
             self.loaded_paths.remove(selected_idx);
             self.papers.remove(selected_idx);
         }

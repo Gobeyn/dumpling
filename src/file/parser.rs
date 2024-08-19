@@ -21,6 +21,7 @@ pub struct Tag {
 pub struct Paper {
     pub title: String,
     pub year: i32,
+    pub journal: String,
     pub description: String,
     pub bibtex: String,
     pub docname: String,
@@ -33,6 +34,7 @@ impl Default for Paper {
         Paper {
             title: String::new(),
             year: 0,
+            journal: String::new(),
             description: String::new(),
             bibtex: String::new(),
             docname: String::new(),

@@ -30,6 +30,7 @@ arguments can be attached to it:
 |------------|-----------|----------|--------|
 | -t | --title | "\[TITLE\]" | Set title of paper |
 | -y | --year | INT | Set year of publication |
+| -j | --journal | "\[JOURNAL\]" | Set journal the paper was published in |
 | / | --desc | "\[DESCRIPTION\]" | Short description of the papers contents |
 | -b | --bibtex | "\[BIB\]" | Bibtex formatted reference for the paper |
 | / | --doc | "\[DOCNAME\]" | Name of the PDF document, the directory is set in the configuration file and should not be provided |
@@ -39,13 +40,13 @@ arguments can be attached to it:
 | -o | --open | No argument | Open the TUI. |
 | / | --list-tags | No argument | List all the tags used and how often they appear. |
 | / | --pdf-diagnose | No argument | Show all the PDF file paths mentioned in the paper files that are invalid, i.e. the file it points to does not exists. Also show all the PDF files in the `pdf_dir` that are not mentioned by any paper file | 
-| / | --auto | No argument | If `--bibtex` is provided, the contents of it are used to automatically infer `--title`, `--year` and all the `--authors`. The result can be overwritten by using those flags anyway. | 
+| / | --auto | No argument | If `--bibtex` is provided, the contents of it are used to automatically infer `--title`, `--year`, `--journal` and all the `--authors`. The result can be overwritten by using those flags anyway. | 
 | -h | --help | No argument | Print the help menu. |
 | / | --version | No argument | Print package information |
 
 Here is an example usage:
 ```
-$ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditions and Duality: a Field Theoretic Approach" -y 2024 --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" -b "@article{dudal2024casimir,
+$ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditions and Duality: a Field Theoretic Approach" -y 2024 -j "Preprint arXiv" --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" -b "@article{dudal2024casimir,
   title={The Casimir energy with perfect electromagnetic boundary conditions and duality: a field-theoretic approach},
   author={Dudal, David and Gobeyn, Aaron and Oosthuyse, Thomas and Stouten, Sebbe and Vercauteren, David},
   journal={arXiv preprint arXiv:2406.19743},
@@ -150,11 +151,9 @@ Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-- Fix issue where deleting a file does not remove it from `Loader.valid_paths`, in some cases it may be possible to attempt a reload of 
-    the file that no longer exists.
 - Currently, there are a few things that are hard coded that shouldn't be. Mainly, the editing assumes `kitty` and `neovim` are installed and 
-    there is no configuration to change that. Similarly, only `wl-clipboard` is supported for copying bibtex contents into.
-- Add a "Published by: JOURNAL" part to the TUI, probably under the author block where "Published: YEAR" is written.
+    there is no configuration to change that. Similarly, only `wl-clipboard` is supported for copying bibtex contents into. This is fine for 
+    personal use, but we should probably make it usable for other people.
 
 ## Why Dumpling
 
