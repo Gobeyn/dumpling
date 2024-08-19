@@ -1,6 +1,6 @@
 use super::parser::{parse_paper_toml, Paper};
+use cli_clipboard::{ClipboardContext, ClipboardProvider};
 use std::collections::VecDeque;
-use wl_clipboard_rs::copy::{MimeType, Options, Source};
 
 /// In the given `filedir`, look for all the files of the valid *.toml format and
 /// store the path to them in a vector that is returned.
@@ -175,39 +175,38 @@ impl Loader {
         self.loaded_paths.push_front(first_load - 1);
         self.papers.push_front(paper);
     }
-    // TODO: Find a system dependent way of doing this. Currently this will only function
-    // on Wayland with wl-clipboard installed.
+
     /// Given an index in the `Loader.papers` vector, copy the
     /// contents of the `Paper.bibtex` field to the system clipboard.
-    /// The method assumes `wl-clipboard` is installed and uses the
-    /// `wl_clipboard_rs` crate.
+    /// The method uses the `cli-clipboard` crate, which should make
+    /// this function on Linux (Wayland and X11), MacOS and Windows.
     pub fn bibtex_entry_to_clipboard(&self, selected_idx: usize) {
+        // Get the entry
         let bibtex_entry = match self.papers.get(selected_idx) {
             Some(p) => p.bibtex.clone(),
             None => {
                 return;
             }
         };
-        let opts = Options::new();
-        match opts.copy(
-            Source::Bytes(bibtex_entry.into_bytes().into()),
-            MimeType::Autodetect,
-        ) {
-            Ok(_) => {}
+        // Get clipboard context
+        let mut ctx = match ClipboardContext::new() {
+            Ok(c) => c,
             Err(_) => {
                 return;
             }
+        };
+        // Set contents
+        match ctx.set_contents(bibtex_entry) {
+            Ok(_) => {}
+            Err(_) => {}
         }
+        // Send notification
         match std::process::Command::new("notify-send")
             .arg("Bibtex copied")
             .status()
         {
-            Ok(_) => {
-                return;
-            }
-            Err(_) => {
-                return;
-            }
+            Ok(_) => {}
+            Err(_) => {}
         }
     }
     // TODO: We could add an argument, that is set by the user in the configuration file
