@@ -278,16 +278,12 @@ impl Loader {
             }
         }
     }
-    // TODO: We could add an argument, that is set by the user in the configuration file
-    // which contains the line `kitty --detach nvim` and use that information to create the
-    // command. Or we could add some fields in the configuration file that specify which terminal
-    // and code editor is being used, though is suspect editors like vscode to not need the
-    // additional terminal part that caused issues with Neovim opening in the current session
-    // as it is a separate GUI all together.
-    /// Open the paper pointed at by `selected_idx` in Neovim.
-    /// Note that this function assumes `kitty` and `nvim` are
-    /// installed.
-    pub fn open_file_in_editor(&self, selected_idx: usize) {
+    /// Open the paper pointed at by `selected_idx` by prepending the given `command` to the file
+    /// path. For example `command = "kitty --detach nvim"` will open a new kitty terminal, and
+    /// open the selected file in Neovim. Another example, `command = "code"` will open the
+    /// selected file in VS Code. This is of course assuming that the respective programs are
+    /// installed on your system
+    pub fn open_file_in_editor(&self, selected_idx: usize, command: &String) {
         // Get the file path pointer
         let fp_pointer = match self.loaded_paths.get(selected_idx) {
             Some(i) => *i,
@@ -304,18 +300,27 @@ impl Loader {
                 return;
             }
         };
-        // Open the file in Neovim
-        match std::process::Command::new("kitty")
-            .arg("--detach")
-            .arg("nvim")
+        // Separate the command into parts by separating by whitespace
+        let mut command_parts = command.split_whitespace();
+        let program = match command_parts.next() {
+            Some(c) => c,
+            None => {
+                log::warn!(
+                    "The `Config.general.editor_command` should not be empty. Stop opening editor"
+                );
+                return;
+            }
+        };
+        let command_args: Vec<&str> = command_parts.collect();
+        // Run the command
+        match std::process::Command::new(program)
+            .args(&command_args)
             .arg(file_path)
             .spawn()
         {
-            Ok(_) => {
-                return;
-            }
+            Ok(_) => {}
             Err(err) => {
-                log::warn!("Error executing command to open editor: {err}");
+                log::warn!("Error executing command to open editor, check that your setting for `Config.general.editor_command` does what you think it does: {err}");
                 return;
             }
         }

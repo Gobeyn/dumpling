@@ -62,7 +62,7 @@ pub fn create_window(file_load: &mut Loader, config: &Config) {
                 file_load.bibtex_entry_to_clipboard(file_pointer);
             }
             event::KeyEvents::Edit => {
-                file_load.open_file_in_editor(file_pointer);
+                file_load.open_file_in_editor(file_pointer, &config.general.editor_command);
             }
             event::KeyEvents::Delete => {
                 file_load.remove_file(file_pointer);
