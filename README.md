@@ -160,7 +160,10 @@ Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-Currently there are no planned changes or known bugs that need to be fixed.
+- Add a confirmation pop-up when attempting to delete an entry.
+- Change explicit `String`'s with `dumpling` to the name of the package. This is just a better practice.
+- Determine the load size automatically, inferred from how many papers can be displayed.
+- Make the percentages of the TUI blocks configurable.
 
 ## Why Dumpling
 
