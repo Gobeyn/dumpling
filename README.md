@@ -15,17 +15,17 @@ The program should work on UNIX based systems, e.g. Linux and MacOS, we are not 
 
 For easy installation, a `Makefile` is provided. It is assumed that [`GNU Make`](https://www.gnu.org/software/make/) and 
 the [Rust ecosystem (e.g. `rustup` and `cargo`)](https://www.rust-lang.org/tools/install) are installed on you system. To build the application run:
-```
-$ make
+```bash
+make
 ```
 To copy the resulting compiled application to the /usr/bin/ directory so it can be accessed globally in you system run:
-```
-$ make install
+```bash
+make install
 ```
 Copying the file to that directory is not required, you could also `export` the path to the binary in your `.bashrc`, `.zshrc`, etc.
 Lastly, to clean files from the compilation process:
-```
-$ make clean
+```bash 
+make clean
 ```
 
 ## Usage 
@@ -52,9 +52,8 @@ arguments can be attached to it:
 | / | --version | No argument | Print package information |
 
 Here is an example usage:
-```
-$ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditions and Duality: a Field Theoretic Approach" -y 2024 -j "Preprint arXiv" --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" 
--b "@article{dudal2024casimir,
+```bash
+dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditions and Duality: a Field Theoretic Approach" -y 2024 -j "Preprint arXiv" --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" -b "@article{dudal2024casimir,
   title={The Casimir energy with perfect electromagnetic boundary conditions and duality: a field-theoretic approach},
   author={Dudal, David and Gobeyn, Aaron and Oosthuyse, Thomas and Stouten, Sebbe and Vercauteren, David},
   journal={arXiv preprint arXiv:2406.19743},
@@ -63,9 +62,8 @@ $ dumpling -t "The Casimir Energy with Perfect Electromagnetic Boundary Conditio
 ```
 Running it will create a new paper information file, stored in `$HOME/.paper` directory. The file name will not be recognizable because it is created by SHA256 encoding of the file contents. 
 The same result can be achieved utilising the `--auto` flag,
-```
-$ dumpling --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" 
--b "@article{dudal2024casimir,
+```bash
+dumpling --desc "Computes the Casimir energy for PEMC boundary conditions between two parallel plates using the electromagnetic field tensor and path integrals" -b "@article{dudal2024casimir,
   title={The Casimir energy with perfect electromagnetic boundary conditions and duality: a field-theoretic approach},
   author={Dudal, David and Gobeyn, Aaron and Oosthuyse, Thomas and Stouten, Sebbe and Vercauteren, David},
   journal={arXiv preprint arXiv:2406.19743},
@@ -73,24 +71,24 @@ $ dumpling --desc "Computes the Casimir energy for PEMC boundary conditions betw
 }" --doc "Dudal_2024.pdf" --tag "Casimir" --tag "PEMC" --tag "EM tensor" --tag "Path integral" --auto
 ```
 The title, year and authors of the paper are inferred from the given bibtex citation. If we then run:
-```
-$ dumpling -o
+```bash
+dumpling -o
 ```
 We will see this paper as inside the TUI. By pressing `b` the bibtex citation for this paper will be put into the system clipboard, and can be pasted where needed. Suppose we made made a second entry: 
-```
-$ dumpling -t "Title" --tag "Tag"
+```bash
+dumpling -t "Title" --tag "Tag"
 ```
 If we open the TUI as before, both papers will appear, but if instead we run:
-```
-$ dumpling -o --filter-tag "Tag"
+```bash
+dumpling -o --filter-tag "Tag"
 ```
 Only the paper titled Test will show up. We can see all the tags being used by running: 
-```
-$ dumpling --list-tags
+```bash
+dumpling --list-tags
 ```
 In the first entry we made during this example, we set `--doc` to "Dudal_2024.pdf". We can see the status of this file by running: 
-```
-$ dumpling --pdf-diagnose
+```bash
+dumpling --pdf-diagnose
 ```
 This will tell us if there are any PDF files mentioned by the paper information files that are not present in `$HOME/.paper/`, and if there are any files in that directory that are not mentioned by a paper information file.
 
@@ -103,9 +101,11 @@ file consists of three section, `[global]`, `[colors]` and `[keybinds]` each dis
 An example configuration file is provided in `./examples/dumpling.toml`, which changes the default colors to the 
 [Rose Pine Moon colorscheme](https://rosepinetheme.com/palette/ingredients/). To use it, create the configuration directory and copy the 
 `dumpling.toml` file to it:
+```bash
+mkdir -p $HOME/.config/dumpling
 ```
-$ mkdir -p $HOME/.config/dumpling
-$ cp ./examples/dumpling.toml $HOME/.config/dumpling
+```bash
+cp ./examples/dumpling.toml $HOME/.config/dumpling
 ```
 Note: Using this configuration requires a [NerdFont](https://github.com/ryanoasis/nerd-fonts) to be installed.
 
@@ -129,7 +129,7 @@ Under the `[colors]` section, the following can be configured:
 | master_block_title | Color of the title of the two master blocks named "Paper Explorer" and "Content" | White |
 | master_block_border | Color of the border of the two master blocks | White |
 | explorer_unselected_fg | Text color of the unselected paper titles | Blue |
-| explorer_unselected_bg | Background color of the unselected paper titles | Black |\
+| explorer_unselected_bg | Background color of the unselected paper titles | Black |
 | explorer_selected_fg | Text color of the selected paper titles | Blue |
 | explorer_selected_bg | Background color of the selected paper titles | Gray |
 | content_block_title | Color of the title of the content blocks named "Title", "Authors", "Description", "Titles" and "Tags"| White |
@@ -160,10 +160,10 @@ Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-- Add a confirmation pop-up when attempting to delete an entry.
-- Change explicit `String`'s with `dumpling` to the name of the package. This is just a better practice.
-- Determine the load size automatically, inferred from how many papers can be displayed.
-- Make the percentages of the TUI blocks configurable.
+- [ ] Add a confirmation pop-up when attempting to delete an entry.
+- [ ] Change explicit `String`'s with `dumpling` to the name of the package. This is just a better practice.
+- [ ] Determine the load size automatically, inferred from how many papers can be displayed.
+- [ ] Make the percentages of the TUI blocks configurable.
 
 ## Why Dumpling
 
