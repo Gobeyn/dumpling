@@ -1,6 +1,6 @@
 [package]
 name = "dumpling"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 authors = ["Aaron Gobeyn"]
 repository = "https://github.com/Gobeyn/dumpling"
@@ -20,3 +20,4 @@ hex = "0.4.3"
 log = "0.4.22"
 env_logger = "0.11.5"
 chrono = "0.4.38"
+termsize = "0.1.9"

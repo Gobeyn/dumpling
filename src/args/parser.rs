@@ -1,6 +1,6 @@
 use super::super::file;
 
-const NAME: &str = env!("CARGO_PKG_NAME");
+pub const NAME: &str = env!("CARGO_PKG_NAME");
 const AUTHOR: &str = env!("CARGO_PKG_AUTHORS");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const LICENSE: &str = env!("CARGO_PKG_LICENSE");

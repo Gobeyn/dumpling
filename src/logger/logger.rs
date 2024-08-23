@@ -1,12 +1,13 @@
+use crate::args::parser::NAME;
 use env_logger::Builder;
 use std::io::Write;
 
-/// Create $HOME/.cache/dumpling/dumpling.log file and set up the logger.
+/// Create log file in the cache directory and set up the logger.
 pub fn init_logging() {
     // Create file path to the logger
     let mut log_file_path = dirs::cache_dir().expect("Error obtaining $HOME/.cache");
-    log_file_path.push("dumpling");
-    log_file_path.push("dumpling.log");
+    log_file_path.push(NAME);
+    log_file_path.push(format!("{}.log", NAME));
 
     // Create and open log file.
     let log_file = std::fs::File::create(log_file_path).expect("Error creating log file");

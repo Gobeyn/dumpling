@@ -412,3 +412,23 @@ impl Loader {
         }
     }
 }
+
+/// Compute the loader size based on the terminal size.
+pub fn compute_loader_size() -> i32 {
+    // First: -1.0 because of master block title
+    // Second: -2.0*2.0 because margin(2) on top and bottom
+    // Third: * 85.0 / 100.0 because explorer takes up 85% of the window
+    // Fourth: -1.0 because of block title.
+    // Fifth: -1.0 as a buffer so we are certainly not overloaded.
+    match termsize::get() {
+        Some(size) => {
+            let tui_rows = ((size.rows as f32 - 1.0) - 2.0 * 2.0) * 85.0 / 100.0 - 1.0 - 1.0;
+            let tui_rows = tui_rows.floor() as i32;
+            return tui_rows;
+        }
+        None => {
+            log::warn!("Could not obtain terminal size. Default value will be used.");
+            return 20;
+        }
+    }
+}

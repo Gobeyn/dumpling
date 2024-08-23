@@ -13,7 +13,6 @@ use std::io::Read;
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(default)]
 pub struct GeneralFromFile {
-    pub load_size: i32,
     pub pdf_viewer: String,
     pub pdf_dir: String, // Cannot contain $HOME or ~, must be a direct path
     pub selection_icon: String,
@@ -38,7 +37,6 @@ impl Default for GeneralFromFile {
             }
         };
         GeneralFromFile {
-            load_size: 30,
             pdf_viewer: String::from("zathura"),
             pdf_dir: String::from(pdf_dir),
             selection_icon: String::from("->"),

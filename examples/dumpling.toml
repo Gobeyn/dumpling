@@ -10,9 +10,9 @@
 # Documentation: https://github.com/Gobeyn/dumpling
 
 [general]
-load_size = 22
 pdf_viewer = "zathura"
 selection_icon = ""
+editor_command = "kitty --detach nvim"
 
 [colors]
 master_block_title = [62,143,176] # Pine

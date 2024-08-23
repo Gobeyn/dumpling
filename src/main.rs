@@ -6,9 +6,9 @@ pub mod listing;
 pub mod logger;
 pub mod ui;
 
-use args::parser::{parse_arguments, ProgArgs};
+use args::parser::{parse_arguments, ProgArgs, NAME};
 use configuration::config::Config;
-use file::loader::Loader;
+use file::loader::{compute_loader_size, Loader};
 use file::parser::write_new_paper;
 use listing::pdfs::pdf_diagnostic;
 use listing::tags::list_tags;
@@ -28,7 +28,7 @@ fn main() {
         }
     };
 
-    folderdir.push("dumpling");
+    folderdir.push(NAME);
     if !folderdir.exists() {
         match std::fs::create_dir(folderdir.clone()) {
             Ok(_) => {}
@@ -47,8 +47,8 @@ fn main() {
             std::process::exit(1);
         }
     };
-    config_path.push("dumpling");
-    config_path.push("dumpling.toml");
+    config_path.push(NAME);
+    config_path.push(format!("{}.toml", NAME));
     let config = Config::from_config_file(&config_path);
 
     // Get program arguments
@@ -63,8 +63,10 @@ fn main() {
                 Some(prog_args.filter_by_tag.clone())
             }
         };
+        // Compute the size of the loader based on the terminal size.
+        let loader_size = compute_loader_size();
         // Load first section of existing papers.
-        let mut file_load: Loader = Loader::load(config.general.load_size, &folderdir, &tag_filter);
+        let mut file_load: Loader = Loader::load(loader_size, &folderdir, &tag_filter);
         create_window(&mut file_load, &config);
     } else {
         if prog_args.flags.list_tags {

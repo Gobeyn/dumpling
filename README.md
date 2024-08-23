@@ -115,7 +115,6 @@ Under the `[global]` section, the following can be configured:
 
 | Name | Value | Effect | Default |
 |------|-------|--------|---------|
-| load_size | 32-bit integer | Amount of files loaded when TUI is opened. This should depend on your monitor size. If more lines are loaded than the TUI can show, you will scroll passed them and the TUI will not scroll with you. | 30 |
 | pdf_viewer | String | PDF viewer to use when attempting to open the paper PDF. | zathura |
 | pdf_dir | String | Directory to search for paper PDF files. Aliases such a `$HOME` and `~` are not supported, so direct paths must be provided | $HOME/.paper/ |
 | selection_icon | Char | Single character to put in front of the currently selected paper inside the TUI | -> |
@@ -161,9 +160,8 @@ Note: all key binds are assumed the be single characters.
 ## Planned changes
 
 - [ ] Add a confirmation pop-up when attempting to delete an entry.
-- [ ] Change explicit `String`'s with `dumpling` to the name of the package. This is just a better practice.
-- [ ] Determine the load size automatically, inferred from how many papers can be displayed.
-- [ ] Make the percentages of the TUI blocks configurable.
+- [x] Change explicit `String`'s with `dumpling` to the name of the package. This is just a better practice.
+- [x] Determine the load size automatically, inferred from how many papers can be displayed.
 
 ## Why Dumpling
 

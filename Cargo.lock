@@ -320,7 +320,7 @@ checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
 
 [[package]]
 name = "dumpling"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "chrono",
  "cli-clipboard",
@@ -334,6 +334,7 @@ dependencies = [
  "regex",
  "serde",
  "sha2",
+ "termsize",
  "toml",
 ]
 
@@ -1044,6 +1045,16 @@ dependencies = [
  "once_cell",
  "rustix",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "termsize"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6f11ff5c25c172608d5b85e2fb43ee9a6d683a7f4ab7f96ae07b3d8b590368fd"
+dependencies = [
+ "libc",
+ "winapi",
 ]
 
 [[package]]
