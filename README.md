@@ -118,7 +118,7 @@ Under the `[global]` section, the following can be configured:
 | pdf_viewer | String | PDF viewer to use when attempting to open the paper PDF. | zathura |
 | pdf_dir | String | Directory to search for paper PDF files. Aliases such a `$HOME` and `~` are not supported, so direct paths must be provided | $HOME/.paper/ |
 | selection_icon | Char | Single character to put in front of the currently selected paper inside the TUI | -> |
-| editor_command | String | Command you want to run to open your preferred file editor on a selected paper information file. The assumed format is `\[editor_command\] \[FILE\]`. For terminal editors like Neovim and Vim, make sure you open a new terminal window as illustrated by the default setting when using `kitty`. For editors like VS Code, setting this to `code` should suffice.| `kitty --detach nvim` |
+| editor_command | String | Command you want to run to open your preferred file editor on a selected paper information file. The assumed format is `[editor_command] [FILE]`. For terminal editors like Neovim and Vim, make sure you open a new terminal window as illustrated by the default setting when using `kitty`. For editors like VS Code, setting this to `code` should suffice.| `kitty --detach nvim` |
 
 ### Colors
 
