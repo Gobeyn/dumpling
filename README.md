@@ -133,6 +133,9 @@ Under the `[colors]` section, the following can be configured:
 | explorer_selected_bg | Background color of the selected paper titles | Gray |
 | content_block_title | Color of the title of the content blocks named "Title", "Authors", "Description", "Titles" and "Tags"| White |
 | content_block_border | Color of the border of the content blocks | White |
+| popup_block_title | Color of the title of a pop-up window | White |
+| popup_block_border | Color of the pop-up window border | Red |
+| popup_text | Color of the text typed inside pop-up windows | White |
 | title_content | Text color of the text inside the "Title" block | White |
 | author_content | Text color of the text inside the "Author" block | White |
 | description_content | Text color of the text inside the "Description" block | White |
@@ -152,16 +155,14 @@ Under the `[keybinds]` section, the following can be configured:
 | previous | Go to the previous paper in the explorer, if the maximum loaded papers is exceeded, the last paper will be unloaded | k |
 | bibtex_to_clipboard | Copy the `bibtex` part of the paper information into the system clipboard. Linux (Wayland and X11), MacOS and Windows are supported, if any errors occur see [cli-clipboard](https://docs.rs/cli-clipboard/latest/cli_clipboard/) | b |
 | edit | Open Neovim in a new window with the currently selected paper information file. It is assumed `kitty` and `neovim` are installed. | e |
-| delete | Delete the currently selection paper file, it will also be unloaded. However, the PDF for it will not be deleted. Warning: the TUI will not ask if you are sure, it immediately deletes the file. | d |
+| delete | Delete the currently selection paper file, it will also be unloaded. A pop-up window will appear asking for confirmation. | d |
 | open_in_pdfviewer | Open the PDF file as pointed to by the currenly selected papers `docname` information with the `pdf_reader` set in the `general` section. The `pdf_dir` specified in the `general` section will be searched for this. | o |
 
 Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-- [ ] Add a confirmation pop-up when attempting to delete an entry.
-- [x] Change explicit `String`'s with `dumpling` to the name of the package. This is just a better practice.
-- [x] Determine the load size automatically, inferred from how many papers can be displayed.
+Currently, there are no planned changes.
 
 ## Why Dumpling
 
