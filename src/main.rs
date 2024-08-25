@@ -4,6 +4,7 @@ pub mod file;
 pub mod key;
 pub mod listing;
 pub mod logger;
+pub mod popup;
 pub mod ui;
 
 use args::parser::{parse_arguments, ProgArgs, NAME};

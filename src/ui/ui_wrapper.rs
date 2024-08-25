@@ -3,6 +3,7 @@ use super::description;
 use super::explorer;
 use super::tags;
 use super::title;
+use super::window::{AppState, PopupState};
 use crate::configuration::config::Config;
 use crate::file::loader::Loader;
 use ratatui::{prelude::*, widgets::*};
@@ -14,6 +15,7 @@ use ratatui::{prelude::*, widgets::*};
 pub fn ui_pre_args<'a>(
     file_load: &'a Loader,
     config: &'a Config,
+    app_state: &'a AppState,
     selected_idx: usize,
 ) -> Box<dyn Fn(&mut Frame) + 'a> {
     Box::new(move |frame: &mut Frame| {
@@ -22,6 +24,7 @@ pub fn ui_pre_args<'a>(
             [Constraint::Percentage(30), Constraint::Percentage(70)],
         )
         .split(frame.size());
+        let explorer_rect = master_layout[0].clone();
 
         // Paper explorer UI
         let explorer_layout = Layout::new(
@@ -158,5 +161,49 @@ pub fn ui_pre_args<'a>(
         frame.render_widget(title_paragraph, content_layout[0]);
         frame.render_widget(author_paragraph, content_layout[1]);
         frame.render_widget(desc_paragraph, content_layout[2]);
+
+        if let PopupState::ConfirmDelete = app_state.popup_state {
+            let block = Block::new()
+                .title(" Confirm delete (y/n) ")
+                .title_alignment(Alignment::Left)
+                .title_style(Style::default().fg(config.colors.popup_block_title))
+                .border_type(BorderType::Rounded)
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(config.colors.popup_block_border));
+            let popup_area = get_popup_rect(selected_idx, explorer_rect);
+            let popup_text = pad_string_back(
+                app_state.popup_core.input.clone(),
+                popup_area.width as usize,
+            );
+            let popup_line = Line::from(Span::styled(
+                popup_text,
+                Style::default().fg(config.colors.popup_text),
+            ));
+            let popup_par = Paragraph::new(popup_line)
+                .block(block)
+                .alignment(Alignment::Left)
+                .wrap(Wrap { trim: true });
+            frame.render_widget(popup_par, popup_area)
+        }
     })
+}
+
+/// Define the location of the pop-up window.
+pub fn get_popup_rect(selected_idx: usize, explorer_rect: Rect) -> Rect {
+    // Use the width of the explorer window to set the x location of the rectangle.
+    let x: u16 = explorer_rect.width;
+    // Set the y location of the rectangle at the current selected file, for this we need
+    // to pad with +2 due to margin, title, etc.
+    let y: u16 = selected_idx as u16 + 2;
+    // Set the width of the pop-up box equal to 75% the width of the explorer.
+    let width: u16 = 3 * explorer_rect.width / 4;
+    // Set the height to 3, which is the minimum we need for a simply y/n box.
+    let height: u16 = 3;
+    return Rect::new(x, y, width, height);
+}
+/// Pad the back of a string with non-breaking space character. This allows us
+/// to remove the background from underlying widgets which are visible even when
+/// padding with normal spaces.
+pub fn pad_string_back(text: String, padding: usize) -> String {
+    format!("{:\u{00A0}<padding$}", text)
 }
