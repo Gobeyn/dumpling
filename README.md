@@ -28,12 +28,13 @@ the [Rust ecosystem (e.g. `rustup` and `cargo`)](https://www.rust-lang.org/tools
 ```bash
 make
 ```
-To copy the resulting compiled application to the /usr/bin/ directory so it can be accessed globally in you system run:
+To copy the resulting compiled application to the `/usr/bin/` directory so it can be accessed globally in you system run:
 ```bash
 make install
 ```
-Copying the file to that directory is not required, you could also `export` the path to the binary in your `.bashrc`, `.zshrc`, etc.
-Lastly, to clean files from the compilation process:
+This install method is not required, you could also `export` the path to the binary in your `.bashrc`, `.zshrc`, etc. In Windows and 
+MacOS this installation method will not work, and you will need to add the compiled program binary to your `PATH` environment. The compiled 
+binary can be found at `./target/release/dumpling`. Lastly, to clean files from the compilation process:
 ```bash 
 make clean
 ```
