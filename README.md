@@ -162,7 +162,8 @@ Note: all key binds are assumed the be single characters.
 
 ## Planned changes
 
-Currently, there are no planned changes.
+- [ ] Allow `$HOME` and `~` aliases in the configuration file.
+- [ ] Allow the paper information files to be stored in a user defined directory.
 
 ## Why Dumpling
 
