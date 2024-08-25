@@ -7,9 +7,19 @@ can be created, and subsequently be explored by the TUI. Inside the TUI a minima
 
 By default, the application assumes papers are stored in `$HOME/.paper/`. The paper information files created by the CLI tool are stored in the 
 `$HOME/.cache/dumpling` directory which is always generated if it does not exists when the program is executed. If there is any weird behaviour, 
-check out the `dumpling.log` file which is also stored in the `$HOME/.cache/dumpling/` directory.
+check out the `dumpling.log` file which is also stored in the `$HOME/.cache/dumpling/` directory. The program assumes PDF files are located 
+in the `$HOME/.paper/` directory, but this can be changed with the configuration file, which the program will look for in `$HOME/.config/dumpling/`.
 
-The program should work on UNIX based systems, e.g. Linux and MacOS, we are not sure if it does on Windows.
+For reference, we list what the above used directory expand to in different operating systems for as user named `USER`. For more alias conversions 
+see the [`dirs` crate](https://docs.rs/crate/dirs/latest).
+
+| Alias | Linux | MacOS | Windows |
+|-------|-------|-------|---------|
+| `$HOME/` | `/home/USER` | `Users/USER/` | `C:\Users\USER\` |
+| `$HOME/.cache/` | `/home/USER/.cache/` | `/Users/USER/Library/Caches/` | `C:\Users\USER\AppData\Local\` |
+| `$HOME/.config/` | `/home/USER/.config/` | `/Users/USER/Library/Application Support/` | `C:\Users\USER\AppData\Roaming\` | 
+
+The `~` alias is also supported, so any instance of `$HOME` can be replaced with `~` if preferred.
 
 ## Installation
 
@@ -100,7 +110,7 @@ file consists of three section, `[global]`, `[colors]` and `[keybinds]` each dis
 
 An example configuration file is provided in `./examples/dumpling.toml`, which changes the default colors to the 
 [Rose Pine Moon colorscheme](https://rosepinetheme.com/palette/ingredients/). To use it, create the configuration directory and copy the 
-`dumpling.toml` file to it:
+`dumpling.toml` file to it, e.g. the following commands in Linux:
 ```bash
 mkdir -p $HOME/.config/dumpling
 ```
@@ -116,8 +126,8 @@ Under the `[global]` section, the following can be configured:
 | Name | Value | Effect | Default |
 |------|-------|--------|---------|
 | pdf_viewer | String | PDF viewer to use when attempting to open the paper PDF. | zathura |
-| pdf_dir | String | Directory to search for paper PDF files. Aliases such a `$HOME` and `~` are not supported, so direct paths must be provided | $HOME/.paper/ |
-| selection_icon | Char | Single character to put in front of the currently selected paper inside the TUI | -> |
+| pdf_dir | String | Directory to search for paper PDF files. The `$HOME` and `~` are allowed, even on Windows. See the beginning of the document for the alias expansions. | $HOME/.paper/ |
+| selection_icon | String | Characters to put in front of the currently selected paper inside the TUI | -> |
 | editor_command | String | Command you want to run to open your preferred file editor on a selected paper information file. The assumed format is `[editor_command] [FILE]`. For terminal editors like Neovim and Vim, make sure you open a new terminal window as illustrated by the default setting when using `kitty`. For editors like VS Code, setting this to `code` should suffice.| `kitty --detach nvim` |
 
 ### Colors
@@ -158,12 +168,11 @@ Under the `[keybinds]` section, the following can be configured:
 | delete | Delete the currently selection paper file, it will also be unloaded. A pop-up window will appear asking for confirmation. | d |
 | open_in_pdfviewer | Open the PDF file as pointed to by the currenly selected papers `docname` information with the `pdf_reader` set in the `general` section. The `pdf_dir` specified in the `general` section will be searched for this. | o |
 
-Note: all key binds are assumed the be single characters.
+Note: all key binds are assumed to be single characters.
 
 ## Planned changes
 
-- [ ] Allow `$HOME` and `~` aliases in the configuration file.
-- [ ] Allow the paper information files to be stored in a user defined directory.
+Currently, there are no planned changes.
 
 ## Why Dumpling
 

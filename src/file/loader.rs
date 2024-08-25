@@ -346,6 +346,8 @@ impl Loader {
         // Create path to that file using the given `pdf_dir`
         let mut file_path = std::path::PathBuf::from(pdf_dir);
         file_path.push(file_name);
+        // Expand $HOME or ~ aliases.
+        file_path = expand_filepath(&file_path);
         // Check that the file exists, then open it in the provided
         // `pdf_viewer`.
         if file_path.exists() {
@@ -430,5 +432,46 @@ pub fn compute_loader_size() -> i32 {
             log::warn!("Could not obtain terminal size. Default value will be used.");
             return 20;
         }
+    }
+}
+
+/// Given a file path that, check if the `$HOME` or `~` are used, and if so,
+/// replace them with their actual value. The use of [`std::path::MAIN_SEPARATOR`] makes sure we
+/// use the right path separator depending on whether the OS is UNIX based or Windows.
+pub fn expand_filepath(path: &std::path::PathBuf) -> std::path::PathBuf {
+    // Check if the `~` alias is used
+    if path.starts_with("~") {
+        match dirs::home_dir() {
+            Some(home_dir) => {
+                let path_str = path.to_string_lossy();
+                return home_dir.join(
+                    path_str
+                        .trim_start_matches('~')
+                        .trim_start_matches(std::path::MAIN_SEPARATOR),
+                );
+            }
+            None => {
+                log::warn!("Unable to obtain $HOME as `PathBuf`.");
+                return path.to_path_buf();
+            }
+        }
+    // Check if the "$HOME" alias is used
+    } else if path.starts_with("$HOME") {
+        match dirs::home_dir() {
+            Some(home_dir) => {
+                let path_str = path.to_string_lossy();
+                return home_dir.join(
+                    path_str
+                        .trim_start_matches("$HOME")
+                        .trim_start_matches(std::path::MAIN_SEPARATOR),
+                );
+            }
+            None => {
+                log::warn!("Unable to obtain $HOME as `PathBuf`.");
+                return path.to_path_buf();
+            }
+        }
+    } else {
+        return path.to_path_buf();
     }
 }

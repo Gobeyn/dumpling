@@ -1,3 +1,4 @@
+use crate::file::loader::expand_filepath;
 use crate::file::parser::{parse_paper_toml, Paper};
 use std::collections::HashSet;
 
@@ -64,14 +65,14 @@ fn load_all_papers(folderdir: &std::path::PathBuf) -> Vec<Paper> {
     return papers;
 }
 
-fn get_paper_pdf_paths(papers: &Vec<Paper>, pdf_dir: &String) -> Pdf {
+fn get_paper_pdf_paths(papers: &Vec<Paper>, pdf_dir: &std::path::PathBuf) -> Pdf {
     // Initialise vector
     let mut valid_paths: Vec<std::path::PathBuf> = Vec::new();
     let mut invalid_paths: Vec<std::path::PathBuf> = Vec::new();
     // Loop through all the papers, extract the docname, append to the pdf_dir and put into
     // mentioned_paths vector
     for paper in papers {
-        let mut file_path = std::path::PathBuf::from(pdf_dir);
+        let mut file_path = pdf_dir.to_path_buf();
         file_path.push(&paper.docname);
         if file_path.exists() {
             valid_paths.push(file_path);
@@ -86,11 +87,11 @@ fn get_paper_pdf_paths(papers: &Vec<Paper>, pdf_dir: &String) -> Pdf {
     };
 }
 
-fn get_stored_pdf_paths(pdf_dir: &String) -> Vec<std::path::PathBuf> {
+fn get_stored_pdf_paths(pdf_dir: &std::path::PathBuf) -> Vec<std::path::PathBuf> {
     let mut pdf_paths: Vec<std::path::PathBuf> = Vec::new();
-    let folder_path = std::path::PathBuf::from(pdf_dir);
+    //let folder_path = std::path::PathBuf::from(pdf_dir);
 
-    let paths = match std::fs::read_dir(&folder_path) {
+    let paths = match std::fs::read_dir(&pdf_dir) {
         Ok(p) => p,
         Err(err) => {
             log::error!("Error obtaining PDF file paths: {err}");
@@ -164,11 +165,12 @@ fn show_invalid_and_not_used_paths(
 }
 
 pub fn pdf_diagnostic(folderdir: &std::path::PathBuf, pdf_dir: &String) {
+    let pdf_dir: std::path::PathBuf = expand_filepath(&std::path::PathBuf::from(pdf_dir));
     // Load the pdf files mentioned by the paper files
     let papers = load_all_papers(folderdir);
-    let paper_pdfs = get_paper_pdf_paths(&papers, pdf_dir);
+    let paper_pdfs = get_paper_pdf_paths(&papers, &pdf_dir);
     // Get the existing PDF file paths
-    let stored_pdfs = get_stored_pdf_paths(pdf_dir);
+    let stored_pdfs = get_stored_pdf_paths(&pdf_dir);
     // Get the PDF file paths not mentioned by any paper file
     let not_used_paths = get_unmatched_pdf_paths(&paper_pdfs.valid_paths, &stored_pdfs);
     // Print the diagnostic
