@@ -57,8 +57,8 @@ pub fn ui_pre_args<'a>(
             .border_type(BorderType::Plain)
             .borders(Borders::ALL)
             .border_style(Style::default().fg(config.colors.content_block_border));
-
-        let explorer_render = explorer::render(file_load, config, selected_idx);
+        let explorer_area = explorer_layout[0].clone();
+        let explorer_render = explorer::render(file_load, config, selected_idx, explorer_area);
         let explorer_paragraph = Paragraph::new(explorer_render)
             .block(explorer_block)
             .alignment(Alignment::Left);

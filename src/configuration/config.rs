@@ -16,6 +16,7 @@ pub struct GeneralFromFile {
     pub pdf_viewer: String,
     pub pdf_dir: String, // Cannot contain $HOME or ~, must be a direct path
     pub selection_icon: String,
+    pub file_icon: String,
     pub editor_command: String,
 }
 
@@ -39,7 +40,8 @@ impl Default for GeneralFromFile {
         GeneralFromFile {
             pdf_viewer: String::from("zathura"),
             pdf_dir: String::from(pdf_dir),
-            selection_icon: String::from("->"),
+            selection_icon: String::from("→  "),
+            file_icon: String::from("F  "),
             editor_command: String::from("kitty --detach nvim"),
         }
     }

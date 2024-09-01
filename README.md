@@ -128,7 +128,8 @@ Under the `[global]` section, the following can be configured:
 |------|-------|--------|---------|
 | pdf_viewer | String | PDF viewer to use when attempting to open the paper PDF. | zathura |
 | pdf_dir | String | Directory to search for paper PDF files. The `$HOME` and `~` are allowed, even on Windows. See the beginning of the document for the alias expansions. | $HOME/.paper/ |
-| selection_icon | String | Characters to put in front of the currently selected paper inside the TUI | -> |
+| selection_icon | String | Characters to put in front of the currently selected paper inside the TUI | → |
+| file_icon | String | Characters to put in front of each paper inside the TUI | F | 
 | editor_command | String | Command you want to run to open your preferred file editor on a selected paper information file. The assumed format is `[editor_command] [FILE]`. For terminal editors like Neovim and Vim, make sure you open a new terminal window as illustrated by the default setting when using `kitty`. For editors like VS Code, setting this to `code` should suffice.| `kitty --detach nvim` |
 
 ### Colors
@@ -173,7 +174,9 @@ Note: all key binds are assumed to be single characters.
 
 ## Planned changes
 
-Currently, there are no planned changes.
+- Add a fuzzy finder filter for the title of the paper, e.g. a flag like `--fzf-title "STRING"`, where the filtered loaded results 
+    are those that match the STRING, fuzzily.
+
 
 ## Why Dumpling
 
