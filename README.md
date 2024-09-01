@@ -166,7 +166,7 @@ Under the `[keybinds]` section, the following can be configured:
 | next | Go to the next paper in the explorer, if the maximum loaded papers is exceeded, the first paper will be unloaded. | j |
 | previous | Go to the previous paper in the explorer, if the maximum loaded papers is exceeded, the last paper will be unloaded | k |
 | bibtex_to_clipboard | Copy the `bibtex` part of the paper information into the system clipboard. Linux (Wayland and X11), MacOS and Windows are supported, if any errors occur see [cli-clipboard](https://docs.rs/cli-clipboard/latest/cli_clipboard/) | b |
-| edit | Open Neovim in a new window with the currently selected paper information file. It is assumed `kitty` and `neovim` are installed. | e |
+| edit | Run the `editor_command` set in the `general` section on the currently selected file. | e |
 | delete | Delete the currently selection paper file, it will also be unloaded. A pop-up window will appear asking for confirmation. | d |
 | open_in_pdfviewer | Open the PDF file as pointed to by the currenly selected papers `docname` information with the `pdf_reader` set in the `general` section. The `pdf_dir` specified in the `general` section will be searched for this. | o |
 
