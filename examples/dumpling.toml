@@ -11,7 +11,8 @@
 
 [general]
 pdf_viewer = "zathura"
-selection_icon = ""
+selection_icon = "  "
+file_icon = "  "
 editor_command = "kitty --detach nvim"
 
 [colors]
