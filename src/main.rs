@@ -17,17 +17,15 @@ use logger::logger::init_logging;
 use ui::window::create_window;
 
 fn main() {
-    // Initialise logger
-    init_logging();
-
     // Create cache directory if it doesn't exist.
     let mut folderdir = match dirs::cache_dir() {
         Some(p) => p,
         None => {
-            log::error!("Could not obtain $HOME/.cache/ as `PathBuf`");
             std::process::exit(1);
         }
     };
+    // Initialise logger
+    init_logging();
 
     folderdir.push(NAME);
     if !folderdir.exists() {
